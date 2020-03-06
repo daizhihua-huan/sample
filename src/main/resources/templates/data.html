@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+</head>
+<body>
+    <button onclick="btn_OpenHls()">��HLS��Ƶ</button>
+    <video id="videoPaly" width="300" height="300"  id="video"></video>
+
+
+	<button onclick="getPlaySpeed()" type="button">当前播放速度/button>
+    <button onclick="setPlaySpeed()" type="button">设置速度</button>
+
+
+</body>
+
+<script>
+
+    function btn_OpenHls() {
+        var htmlvideo = document.getElementById("videoPaly");
+        htmlvideo.controls = true;
+        var hls = new Hls();
+        hls.loadSource("http://39.104.177.194/20200305/out.m3u8");//m3u8�ļ�·��
+        hls.attachMedia(htmlvideo);
+        hls.on(Hls.Events.MANIFEST_PARSED, function () {
+            htmlvideo.play();
+        });
+    }
+    function getPlaySpeed() {
+        alert(1)
+        var htmlvideo = document.getElementById("videoPaly");
+        alert(htmlvideo.playbackRate);//��ȡ��Ƶ/��Ƶ�Ĳ����ٶ�
+    }
+    function setPlaySpeed() {
+        var htmlvideo = document.getElementById("videoPaly");
+        htmlvideo.playbackRate=2;//������Ƶ/��Ƶ�Ĳ����ٶ�
+    }
+
+
+</script>
+</html>

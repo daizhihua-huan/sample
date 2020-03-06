@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<!--横向菜单开始-->
+<div class="grid_12">
+    ...
+</div>
+<!--横向菜单结束-->
+<div class="clear"></div>
+<!--侧边菜单开始-->
+<div class="grid_2">
+    ...
+</div>
+<!--侧边菜单结束-->
+<!--内容开始-->
+<div style="width: 82%;float: left;">
+    <iframe id="iframe" name="mainFrame" src="" width="100%" scrolling="yes" frameborder="0"></iframe>
+</div>
+<!--内容结束-->
+</div>
+<div class="clear"></div>
+<div id="site_info"><p>Copyright...</p></div>
+</body>
+<script type="text/javascript">
+    /*全屏iframe*/
+    function quan() {
+        /*全屏iframe兼容*/
+        var docElm = document.documentElement;
+        if (docElm.requestFullscreen) {
+            docElm.requestFullscreen();
+        } else if (docElm.mozRequestFullScreen) {
+            docElm.mozRequestFullScreen();
+        } else if (docElm.msRequestFullscreen) {
+            docElm.msRequestFullscreen();
+        } else if (docElm.oRequestFullscreen) {
+            docElm.oRequestFullscreen();
+        } else if (docElm.webkitRequestFullScreen) {
+            docElm.webkitRequestFullScreen();
+        }
+        $(".grid_12").css("display", "none");
+        $("#site_info").css("display", "none");
+        $("#full-screen-btn").css("display", "none");
+        $("iframe").css("height", "100%");
+        $("iframe").css("width", "100%");
+        $("iframe").css("position", 'fixed');
+        $("iframe").css("left", "0px");
+        $("iframe").css("top", "0px");
+
+    }
+    /*退出全屏iframe*/
+    function exitQ() {
+        var mainheight = $('.sidemenu').height();  获取侧边菜单高度
+        $(".grid_12").css("display", "");
+        $("#site_info").css("display", "");
+        $("#full-screen-btn").css("display", "");
+        /*退屏iframe兼容*/
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.oRequestFullscreen) {
+            document.oCancelFullScreen();
+        } else if (document.webkitCancelFullScreen) {
+            document.webkitCancelFullScreen();
+        }
+        $("iframe").css("height",mainheight + 'px');    高度是侧边菜单高度，保持一致
+        $("iframe").css("width", "");
+        $("iframe").css("position", "");
+        $("iframe").css("left", "");
+        $("iframe").css("top", "");
+    }
+</script>
+</html>
