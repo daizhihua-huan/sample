@@ -180,6 +180,7 @@
                 <!-- src/main/resources下的指定资源放行 -->
                 <includes>
                     <include>**/*.*</include>
+                    <!--<include>s</include>-->
                     <include>**/*/*.*</include>
                     <include>**/*.properties</include>
                     <include>**/*.yml</include>

@@ -4,19 +4,15 @@ package com.daizhihua.sample.dao;
 //import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.daizhihua.sample.entity.DataEntity;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
-
-import java.util.List;
+import com.daizhihua.sample.entity.PointData;
 
 //@Mapper
 //@Repository("dataMapper")
 
-public interface DataMapper  extends BaseMapper<DataEntity> {
+public interface PointDataMapper extends BaseMapper<PointData> {
 
 
-    @Select("select * from soucedata")
-    List<DataEntity> getAll();
+
 
 
 

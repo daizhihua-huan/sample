@@ -1,79 +1,723 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link href="../static/css/BigData.css" rel="stylesheet" type="text/css" />
+    <link href="../static/css/index.css" rel="stylesheet" type="text/css" />
+    <link href="../static/css/index01.css" rel="stylesheet" type="text/css" />
+    <script src="../static/js/jquery.js"></script>
+    <link href="../static/js/bstable/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="../static/js/bstable/css/bootstrap-table.css" rel="stylesheet" type="text/css" />
+    <link href="../static/css/Security_operation.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="static/js/artDialog/skins/default.css" type="text/css"/>
+    <script src="../static/js/laydate.js"></script>
+    <script src="../static/js/Home_page.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" href="../static/layui/css/layui.css"  media="all">
+    <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css"/>
     <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-<!--横向菜单开始-->
-<div class="grid_12">
-    ...
-</div>
-<!--横向菜单结束-->
-<div class="clear"></div>
-<!--侧边菜单开始-->
-<div class="grid_2">
-    ...
-</div>
-<!--侧边菜单结束-->
-<!--内容开始-->
-<div style="width: 82%;float: left;">
-    <iframe id="iframe" name="mainFrame" src="" width="100%" scrolling="yes" frameborder="0"></iframe>
-</div>
-<!--内容结束-->
-</div>
-<div class="clear"></div>
-<div id="site_info"><p>Copyright...</p></div>
-</body>
-<script type="text/javascript">
-    /*全屏iframe*/
-    function quan() {
-        /*全屏iframe兼容*/
-        var docElm = document.documentElement;
-        if (docElm.requestFullscreen) {
-            docElm.requestFullscreen();
-        } else if (docElm.mozRequestFullScreen) {
-            docElm.mozRequestFullScreen();
-        } else if (docElm.msRequestFullscreen) {
-            docElm.msRequestFullscreen();
-        } else if (docElm.oRequestFullscreen) {
-            docElm.oRequestFullscreen();
-        } else if (docElm.webkitRequestFullScreen) {
-            docElm.webkitRequestFullScreen();
+    <title>土地质量地球化学监测成果展示系统</title>
+    <style>
+        img{
+            width: 2rem;
+            width: 2rem;
+            margin-left: 5px;
         }
-        $(".grid_12").css("display", "none");
-        $("#site_info").css("display", "none");
-        $("#full-screen-btn").css("display", "none");
-        $("iframe").css("height", "100%");
-        $("iframe").css("width", "100%");
-        $("iframe").css("position", 'fixed');
-        $("iframe").css("left", "0px");
-        $("iframe").css("top", "0px");
+        .make{
+            display: flex;
+            flex-direction: column;
+            background: rgb(39,39,39);
+            width: 15rem;
+            height: 9rem;
+            color: #d2d2d2;
+        }
+        label{
+            margin-top: 10px;
+            margin-left: 2rem;
+        }
+    </style>
+</head>
+<body >
+<div class="data_bodey">
+    <div class="index_nav" >
+        <ul style="height: 30px; margin-bottom: 0px;">
+            <li class="l_left total_chose_fr nav_active">重点监测展示</li>
+            <li class="l_left total_chose_pl" >区域监测展示</li>
+            <li class="l_left total_chose_pl"></li>
+            <li class="r_right total_chose_pl">统计分析三</li>
+            <li class="r_right total_chose_pl">统计分析四</li>
+            <li class="r_right total_chose_pl">文件上传</li>
+        </ul>
+
+        <div class="clear"></div>
+    </div>
+    <div class="index_tabs" >
+        <!--安防运作-->
+        <div class="inner">
+            <div class="center_cage" style="width: 100%">
+                <div class="dataAllBorder01 cage_cl" style="margin-top: 3.5% !important; height: 90%; width:100%; position: relative;">
+                    <select  name="city" lay-verify="" style="width: 100%;background-color: #ffffff;" id="city">
+                    </select>
+                    <!--<div>-->
+                    <!---->
+                    <!--</div>-->
+                    <div id="container" style="width: 100%;height: 100%"></div>
+                    <div class="input-card" style="width:8rem;bottom: 9rem;left: 1rem;">
+                        <h4>图例</h4>
+                        <div>
+                            <div class="input-item">
+                                <span>一级</span>
+                                <div>
+                                    <img src="../static/img/icon.png"/>
+
+                                </div>
+                            </div>
+                            <div class="input-item">
+                                <span>二级</span>
+                                <div>
+                                    <img src="../static/img/iconname.png"/>
+                                </div>
+                            </div>
+                            <div class="input-item">
+                                <span>三级</span>
+                                <div>
+                                    <img src="../static/img/icon2.png"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="inner" style="display: none;" >
+            <div class="center_cage" style="width: 100%">
+                <div class="dataAllBorder01 cage_cl" style="margin-top: 3.5% !important; height: 90%; width:100%; position: relative;">
+                    <!--<iframe src ="https://maplab.amap.com/share/mapv/dc684e3d073a31071c4c7300e966f69c" width="100%" height="100%" id="ifr2" name="ifr2"-->
+                    <!--frameborder="no" border="0" marginwidth="0" marginheight="0" scrolling="no" allowtransparency="yes">-->
+                    <!--</iframe>-->
+                </div>
+            </div>
+
+        </div>
+
+        <div class="inner" style="display:none" >
+            <div class="center_cage" style="width: 100%">
+                <div class="dataAllBorder01 cage_cl" style="margin-top: 3.5% !important; height: 90%; width:100%; position: relative;">
+                    <!--<iframe src ="https://maplab.amap.com/share/mapv/89daccd69cdedb721e0d5d2015ec4075" width="100%" height="100%" id="ifr3" name="ifr3"-->
+                    <!--frameborder="no" border="0" marginwidth="0" marginheight="0" scrolling="no" allowtransparency="yes">-->
+                    <!--</iframe>-->
+
+                    <!--<div id="container" class="map" tabindex="0"></div>-->
+                </div>
+            </div>
+        </div>
+
+        <div class="inner" style="display: none">
+            <div class="clear"></div>
+            <div class="data_left05">
+                <div class="dataAllNo02 ">
+                    <div class="dataAllBorder01">
+                        <div class="dataAllBorder02">
+                            <div class="data_tit">xxxxxxx分析</div>
+                            <p class="data_chart02" id="shijian01"></p>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="data_left05">
+                <div class="dataAllNo02 ">
+                    <div class="dataAllBorder01">
+                        <div class="dataAllBorder02">
+                            <div class="data_tit">xxxxx分析</div>
+                            <table class="table_data02">
+                                <tr><td class="font07">事件类型</td><td class="font03">5个</td><td class="font07">xxxx</td><td class="font02">560万</td></tr>
+                                <tr><td class="font07">最多发生事件</td><td class="font01">xxxx</td><td class="font07">最少发生事件</td><td class="font01">xxxxx</td></tr>
+
+                            </table>
+                            <p class="data_chart02" id="shijian03"></p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="clear"></div>
+            <div class="data_left05">
+                <div class="dataAllNo02">
+                    <div class="dataAllBorder01">
+                        <div class="dataAllBorder02">
+                            <div class="data_tit">xxxx分析</div>
+                            <p class="data_chart02" id="shijian02"></p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="data_left05">
+                <div class="dataAllNo02">
+                    <div class="dataAllBorder01">
+                        <div class="dataAllBorder02">
+                            <div class="data_tit">xxxxxx分析</div>
+
+                            <p class="data_chart03" id="shijian04"></p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="inner" style="display: none">
+            <div class="manage_left l_left">
+                <!--<div class="manage_left_nav"><img src="img/left_nav.png"/></div>-->
+                <div class="manage_line1">
+                    <!--<div class="manage_line2">
+                        <div class="manage_top_middle">
+                            <table class="table table-bordered">
+                                <tbody>
+                                <tr>
+                                    <td>xxxx总数</td>
+                                    <td colspan="3">25414人</td>
+                                </tr>
+                                <tr>
+                                    <td>xxxxx</td>
+                                    <td colspan="3">省内游客</td>
+                                </tr>
+                                <tr>
+                                    <td>xxxxx</td>
+                                    <td colspan="3">青年</td>
+                                </tr>
+                                <tr>
+                                    <td>男性游客</td>
+                                    <td>5424人</td>
+                                    <td>女性游客</td>
+                                    <td>5457人</td>
+                                </tr>
+                                <tr>
+                                    <td>团队游客</td>
+                                    <td>5424人</td>
+                                    <td>散客</td>
+                                    <td>5457人</td>
+                                </tr>
+                                <tr>
+                                    <td>同比</td>
+                                    <td>下降5%</td>
+                                    <td>环比</td>
+                                    <td>上升5.6%</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <p>xxxxx数据汇总</p>
+                        </div>
+                        <div class="manage_left_top">
+                            <div class="manage_top_left l_left">
+                                <div id="container2" style="height: 90%"></div>
+                                <p>xxxxx分析</p>
+                            </div>
+                            <div class="manage_top_left l_left">
+                                <div id="container1" style="height: 90%"></div>
+                                <p>xxxx分析</p>
+                            </div>
+                            <div class="manage_top_left l_left">
+                                <div id="container3" style="height:90%"></div>
+                                <p>xxxx分析</p>
+                            </div>
+
+                        </div>
+                        <div class="manage_top_middle">
+                            <div id="container4" style="height: 90%"></div>
+                            <p>xxxx数据分析</p>
+                        </div>
+                        &lt;!&ndash;<div class="manage_top_middle l_left">&ndash;&gt;
+                        &lt;!&ndash;<div id="container5" style="height: 90%"></div>&ndash;&gt;
+                        &lt;!&ndash;<p>天气——游客数据分析</p>&ndash;&gt;
+                        &lt;!&ndash;</div>&ndash;&gt;
+                    </div>-->
+                </div>
+            </div>
+            <div class="manage_left l_left">
+                <!--<div class="manage_left_nav"><img src="img/left_nav.png"/></div>-->
+                <div class="manage_line1">
+                    <!--<div class="manage_line2">-->
+                    <!--<div class="manage_top_middle l_left">-->
+                    <!--<div id="container9" style="height: 90%"></div>-->
+                    <!--<p>xxxx情况</p>-->
+                    <!--</div>-->
+                    <!--<div class="manage_top_middle l_left">-->
+                    <!--<div id="container10" style="height: 90%"></div>-->
+                    <!--<p>xxxx分析</p>-->
+                    <!--</div>-->
+                    <!--<div class="manage_top_middle l_left">-->
+                    <!--<div id="container11" style="height: 90%"></div>-->
+                    <!--<p>xxxx分析</p>-->
+                    <!--</div>-->
+                    <!--</div>-->
+                </div>
+            </div>
+            <div class="manage_left l_left">
+                <!--<div class="manage_left_nav"><img src="img/left_nav.png"/></div>-->
+                <div class="manage_line1">
+                    <div class="manage_line2">
+                        <div class="manage_top_middle">
+                            <div id="container12" style="height: 90%"></div>
+                            <p>xxxxx排行</p>
+                        </div>
+                        <div class="manage_top_middle">
+                            <div id="container6" style="height: 90%"></div>
+                            <p>xxxx数据分析</p>
+                        </div>
+                        <div class="manage_top_middle l_left">
+                            <div id="container5" style="height: 90%"></div>
+                            <p>xxxxx数据分析</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="inner" style="display: none;">
+            <div style="height: 400px;">
+
+                <div class="layui-row" style="margin-top: 100px;margin-left: 20px;">
+                    <div class="layui-col-xs3">
+                        <div class="grid-demo grid-demo-bg1">
+                            &nbsp;</div>
+                    </div>
+                    <div class="layui-col-xs3">
+                        <div class="grid-demo">
+                            <div class="layui-upload">
+                                <div style="width: 216px; margin: 0;">
+                                    <button type="button" class="layui-btn layui-btn-lg layui-btn-primary layui-btn-radius" id="test8">选择文件</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-col-xs3">
+                        <div class="grid-demo grid-demo-bg1">&nbsp;</div>
+                    </div>
+                    <div class="layui-col-xs3">
+                        <div class="grid-demo">
+                            <button type="button" class="layui-btn" id="test9">开始上传</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layui-row">
+                    <div class="layui-col-xs3">
+                        <div class="grid-demo grid-demo-bg1">&nbsp;</div>
+                    </div>
+                    <div class="layui-col-xs7">
+                        <div class="grid-demo">
+                            <div style="margin-left: 13px"  class="layui-progress layui-progress-big" lay-showpercent="true" lay-filter="demo">
+                                <div class="layui-progress-bar layui-bg-cyan" lay-percent="0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--                    <div class="layui-col-xs3">-->
+                    <!--                        <div class="grid-demo grid-demo-bg1">&nbsp;</div>-->
+                    <!--                    </div>-->
+                </div>
+
+
+            </div>
+
+            <!--            <table id="table1" class="table table-condensed">-->
+            <!--                <thead>-->
+            <!--                <tr>-->
+            <!--                    <th>ID</th>-->
+            <!--                    <th>Name</th>-->
+            <!--                    <th>Score</th>-->
+            <!--                </tr>-->
+            <!--                </thead>-->
+            <!--                <tbody>-->
+            <!--                <tr>-->
+            <!--                    <td>001</td>-->
+            <!--                    <td>zhang</td>-->
+            <!--                    <td>98</td>-->
+            <!--                </tr>-->
+            <!--                <tr>-->
+            <!--                    <td>002</td>-->
+            <!--                    <td>wang</td>-->
+            <!--                    <td>99</td>-->
+            <!--                </tr>-->
+            <!--                </tbody>-->
+            <!--            </table>-->
+        </div>
+
+    </div>
+</div>
+
+<script src="../static/js/echarts-all.js"></script>
+<script src="../static/js/index.js"></script>
+<script src="../static/js/bstable/js/bootstrap.min.js"></script>
+<script src="../static/js/bstable/js/bootstrap-table.js"></script>
+<script type="text/javascript" src="../static/js/jquery.pagination.js"></script>
+<script src="../static/js/bstable/js/bootstrap-table-zh-CN.min.js"></script>
+<script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=5fce795a815c40075986d0457d008454"></script>
+<!--<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=5ieMMexWmzB9jivTq6oCRX9j&callback"></script>-->
+
+<!--<script src="js/MainMap.js"></script>-->
+<script src="../static/js/Home_page.js"></script>
+<script src="../static/js/artDialog/artDialog.js"></script>
+<script src="../static/js/artDialog/plugins/iframeTools.source.js"></script>
+<script src="../static/layui/layui.js" charset="utf-8"></script>
+<script src="../static/js/myjqueryajax.js"></script>
+<link rel="stylesheet" href="https://cache.amap.com/lbs/static/main1119.css"/>
+<script>
+
+    var map;
+    map = new AMap.Map('container', {
+        zoom: 11,
+        center: [116.397428, 39.90923],
+        resizeEnable: true,
+        mapStyle: 'amap://styles/5e5e1d41627490a3db3784528d6e545a'
+    });
+
+
+
+
+
+
+
+
+    function getLngLat(){
+        var lnglatInput = document.getElementById('lnglat');
+
+        lnglatInput.setAttribute('value', lnglat.toString());
+    }
+    /*$.ajax({
+        //请求方式
+        type : "GET",
+        //请求的媒体类型
+        contentType: "application/json;charset=UTF-8",
+        //请求地址
+        url : "/getData",
+        data:{
+            name:'cu',
+            index:4,
+            type:'重点监测'
+        },
+        // url: "https://a.amap.com/jsapi_demos/static/citys.js",
+        //数据，json字符串
+        //请求成功
+        success : function(res) {
+
+        },
+        //请求失败，包含具体的错误信息
+        error : function(e){
+            console.log(e.status);
+            console.log(e.responseText);
+        }
+    });*/
+
+
+
+    layui.use(['upload','element'], function(){
+        var $ = layui.jquery
+            ,upload = layui.upload,element = layui.element;
+
+        //选完文件后不自动上传
+        upload.render({
+            elem: '#test8'
+            ,url: '/sendFile' //改成您自己的上传接口
+            ,auto: false
+            ,accept:'file'
+            ,exts:'xls|xlsx'
+            ,field:'file'
+            //,multiple: true
+            ,bindAction: '#test9'
+            ,progress: function(n, elem) {
+                console.log(elem)
+                var percent = n + '%' //获取进度百分比
+                console.log(percent)
+                element.progress('demo', percent); //可配合 layui 进度条元素使用
+            }
+            ,done: function(res){
+                layer.msg('上传成功');
+                console.log(res)
+            }
+        });
+        //多文件列表示例
+        var demoListView = $('#demoList')
+            ,uploadListIns = upload.render({
+            elem: '#testList'
+            ,url: 'https://httpbin.org/post' //改成您自己的上传接口
+            ,accept: 'file'
+            ,multiple: true
+            ,auto: false
+            ,bindAction: '#testListAction'
+            ,choose: function(obj){
+                var files = this.files = obj.pushFile(); //将每次选择的文件追加到文件队列
+                //读取本地文件
+                obj.preview(function(index, file, result){
+                    var tr = $(['<tr id="upload-'+ index +'">'
+                        ,'<td>'+ file.name +'</td>'
+                        ,'<td>'+ (file.size/1024).toFixed(1) +'kb</td>'
+                        ,'<td>等待上传</td>'
+                        ,'<td>'
+                        ,'<button class="layui-btn layui-btn-xs demo-reload layui-hide">重传</button>'
+                        ,'<button class="layui-btn layui-btn-xs layui-btn-danger demo-delete">删除</button>'
+                        ,'</td>'
+                        ,'</tr>'].join(''));
+
+                    //单个重传
+                    tr.find('.demo-reload').on('click', function(){
+                        obj.upload(index, file);
+                    });
+
+                    //删除
+                    tr.find('.demo-delete').on('click', function(){
+                        delete files[index]; //删除对应的文件
+                        tr.remove();
+                        uploadListIns.config.elem.next()[0].value = ''; //清空 input file 值，以免删除后出现同名文件不可选
+                    });
+
+                    demoListView.append(tr);
+                });
+            }
+            ,done: function(res, index, upload){
+                if(res.files.file){ //上传成功
+                    var tr = demoListView.find('tr#upload-'+ index)
+                        ,tds = tr.children();
+                    tds.eq(2).html('<span style="color: #5FB878;">上传成功</span>');
+                    tds.eq(3).html(''); //清空操作
+                    return delete this.files[index]; //删除文件队列已经上传成功的文件
+                }
+                this.error(index, upload);
+            }
+            ,error: function(index, upload){
+                var tr = demoListView.find('tr#upload-'+ index)
+                    ,tds = tr.children();
+                tds.eq(2).html('<span style="color: #FF5722;">上传失败</span>');
+                tds.eq(3).find('.demo-reload').removeClass('layui-hide'); //显示重传
+            }
+        });
+
+
+    });
+
+</script>
+
+<script>
+    var number;
+    $(function() {
+        if (window.screen.height <= 768) {
+            number = 4;
+        } else if (window.screen.height > 768 && window.screen.height <= 900) {
+            number = 6
+        } else if (window.screen.height > 1080) {
+            number = 8
+        }
+    });
+    $(".file").on("change","input[type='file']",function(){
+        alert(1)
+        var filePath=$(this).val();
+        if(filePath.indexOf("xls")!=-1 || filePath.indexOf("xlsl")!=-1){
+            $(".file").html("").hide();
+            var arr=filePath.split('\\');
+            var fileName=arr[arr.length-1];
+            $(".file").html(fileName);
+        }else{
+            $(".showFileName").html("");
+            $(".fileerrorTip").html("您未上传文件，或者您上传文件类型有误！").show();
+            return false
+        }
+    })
+
+    //    翻页模块
+    $(".tcdPageCode").createPage({
+        pageCount:5,
+        current:1,
+        backFn:function(p){}
+    });
+    $(".chemistry_tcdPageCode").createPage({
+        pageCount:4,
+        current:1,
+        backFn:function(p){}
+    });
+    $(".enterprise_tcdPageCode").createPage({
+        pageCount:4,
+        current:1,
+        backFn:function(p){}
+    });
+    $(".car_tcdPageCode").createPage({
+        pageCount:4,
+        current:1,
+        backFn:function(p){}
+    });
+
+    $(function () {
+        $(".tit02Diva a").each(function (index) {
+            $(this).on("click",function () {
+                $(".data_map").eq(index).fadeIn().siblings(".data_map").stop().hide();
+                $(this).prev('i').removeClass('i_crlieAction');
+                $(this).siblings('a').prev('i').addClass('i_crlieAction');
+
+            })
+        });
+        BootstrapTable();
+        $("#fresh_tool").click(function(event){
+            event.stopPropagation();
+            cancel();
+        })
+
+    });
+    function EventClick(){
+        $(".check_increase").removeClass("check_increase_act");
+        $("#over_hide1").show().siblings().hide();
+        $(".check_decrease").show();
+        $("#cage_cl").hide();
+        $("#map_title_innerbox").hide();
+        $("#cage_cl1").show();
+//        $("#over_hide").show();
+        $("#map_title_innerbox1").show();
+        $(".addition_check_in").hide();
+        $("#car_check_in").hide();
+        BootstrapTable();
+    }
+    function cancel(e){
+        $(".check_increase").removeClass("check_increase_act");
+        $("#over_hide").show().siblings().hide();
+        $(".check_decrease").show();
+        $("#cage_cl").show();
+        $("#cage_cl1").hide();
+//        $("#cage_cl").show();
+//        $("#over_hide1").show();
+//        $("#map_title_innerbox").show();
+        BootstrapTable();
+    }
+
+    //    地址检索
+    $(".addition_check_btn").click(function () {
+        $(".check_increase").addClass("check_increase_act");
+        $(".check_decrease").hide()
+        $(".addition_check_in").show().siblings().hide()
+    });
+
+    //    危化品检索
+    function chemistryCheck() {
+        $(".check_increase").addClass("check_increase_act");
+        $(".check_decrease").hide()
+        $("#chemistry_check_in").show().siblings().hide()
+    }
+
+    //    企业检索
+    function enterpriseCheck() {
+        $(".check_increase").addClass("check_increase_act");
+        $(".check_decrease").hide()
+        $("#enterprise_check_in").show().siblings().hide()
+    }
+
+    //    车辆检索
+    function carCheck() {
+        $(".check_increase").addClass("check_increase_act");
+        $(".check_decrease").hide()
+        $("#car_check_in").show().siblings().hide()
+    }
+
+    function BootstrapTable() {
 
     }
-    /*退出全屏iframe*/
-    function exitQ() {
-        var mainheight = $('.sidemenu').height();  获取侧边菜单高度
-        $(".grid_12").css("display", "");
-        $("#site_info").css("display", "");
-        $("#full-screen-btn").css("display", "");
-        /*退屏iframe兼容*/
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-        } else if (document.msExitFullscreen) {
-            document.msExitFullscreen();
-        } else if (document.mozCancelFullScreen) {
-            document.mozCancelFullScreen();
-        } else if (document.oRequestFullscreen) {
-            document.oCancelFullScreen();
-        } else if (document.webkitCancelFullScreen) {
-            document.webkitCancelFullScreen();
+
+
+
+
+    function TimeControl(){
+        $(".message_scroll_box").animate({marginTop:96},800,
+            function(){
+                $(".message_scroll_box").css({marginTop:0});    //把顶部的边界清零
+                $(".message_scroll_box .message_scroll:first").before($(".message_scroll_box .message_scroll:last"));    //在第一个新闻后面插入最后一个新闻
+
+            });
+    }
+    var T=setInterval(TimeControl,2300);    //开始定时
+    $(".message_scroll_box").mouseenter(function(){
+        clearInterval(T);    //停止定时
+    })
+        .mouseleave(function(){
+            T=setInterval(TimeControl,2500);    //再次定时
+        })
+
+</script>
+
+<!--轨迹回放时间日期选择-->
+<script>
+    !function(){
+        laydate.skin('danlan');//切换皮肤，请查看skins下面皮肤库
+        laydate({elem: '#demo'});
+        laydate({elem: '#demo1'});//绑定元素
+    }();
+    //日期范围限制
+    var start = {
+        elem: '#start',
+        format: 'YYYY-MM-DD',
+        min: laydate.now(), //设定最小日期为当前日期
+        max: '2099-06-16', //最大日期
+        istime: true,
+        istoday: false,
+        choose: function(datas){
+            end.min = datas; //开始日选好后，重置结束日的最小日期
+            end.start = datas //将结束日的初始值设定为开始日
         }
-        $("iframe").css("height",mainheight + 'px');    高度是侧边菜单高度，保持一致
-        $("iframe").css("width", "");
-        $("iframe").css("position", "");
-        $("iframe").css("left", "");
-        $("iframe").css("top", "");
+    };
+
+    var end = {
+        elem: '#end',
+        format: 'YYYY-MM-DD',
+        min: laydate.now(),
+        max: '2099-06-16',
+        istime: true,
+        istoday: false,
+        choose: function(datas){
+            start.max = datas; //结束日选好后，充值开始日的最大日期
+        }
+    };
+    laydate(start);
+    laydate(end);
+    function edit() {
+        layer.open({
+            type: 2,
+            title: '存储详情',
+            shade: 0.5,
+            skin: 'layui-layer-rim',
+            area: ['700px', '400px'],
+            shadeClose: true,
+            closeBtn: 1,
+            content: 'saveFindTail.html'
+        });
     }
 </script>
+
+
+</body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

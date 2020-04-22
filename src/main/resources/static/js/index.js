@@ -8,10 +8,13 @@ $(function(){
         $(this).click(function(){
             $(this).addClass("nav_active").siblings().removeClass("nav_active");
             $(".index_tabs .inner").eq(index).fadeIn().siblings("div").stop().hide();
-            if(index==1){
-                yingXiao();
+            if(index==0){
+                console.log(index)
+            }else if(index==1){
+                console.log(1);
             }else if(index==2){
-                shouRu();
+                console.log(2)
+
             }else if(index==3){
                 AnQuan();
             }else if(index==4){
@@ -2658,7 +2661,7 @@ function yingXiao(){
 
 }
 
-function shouRu(){
+/*function shouRu(){
 // 收入支出分析
 // 收入渠道分析
     $(function(){
@@ -3107,7 +3110,7 @@ function shouRu(){
 
         myChart.setOption(option);
     });
-}
+}*/
 
 function AnQuan(){
     // 安全分析

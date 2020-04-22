@@ -129,16 +129,16 @@ public class ExcelUtils {
                     if (StringUtils.isEmpty(headName)) {
                         continue;
                     }
-                    ExcelHead eHead = null;
-                    if (!CollectionUtils.isEmpty(excelHeads)) {
-                        for (ExcelHead excelHead : excelHeads) {
-                            if (headName.toLowerCase().equals(excelHead.getExcelName().toLowerCase())) {
-                                eHead = excelHead;
-                                headName = eHead.getEntityName();
-                                break;
-                            }
-                        }
-                    }
+//                    ExcelHead eHead = null;
+//                    if (!CollectionUtils.isEmpty(excelHeads)) {
+//                        for (ExcelHead excelHead : excelHeads) {
+//                            if (headName.toLowerCase().equals(excelHead.getExcelName().toLowerCase())) {
+//                                eHead = excelHead;
+//                                headName = eHead.getEntityName();
+//                                break;
+//                            }
+//                        }
+//                    }
                     Field field = fields[cellIndex];
                     String methodName = MethodUtils.setMethodName(field.getName());
                     Method method = classzz.getMethod(methodName, field.getType());
@@ -147,10 +147,10 @@ public class ExcelUtils {
                         if(cell!=null){
                             date=cell.getDateCellValue();
                         }
-                        if (date == null) {
-                            volidateValueRequired(eHead,sheetName,rowIndex);
-                            break;
-                        }
+//                        if (date == null) {
+//                            volidateValueRequired(eHead,sheetName,rowIndex);
+//                            break;
+//                        }
                         method.invoke(instance, cell.getDateCellValue());
                     } else {
                         String value = null;

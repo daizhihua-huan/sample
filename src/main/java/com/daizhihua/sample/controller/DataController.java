@@ -14,4 +14,24 @@ public class DataController {
     public String uploda(){
         return "layui";
     }
+
+    @RequestMapping(value = "/map")
+    public String map(){
+        return "map";
+    }
+
+    @RequestMapping(value = "/mapmaker")
+    public String mapmaker(){
+        return "mapmaker";
+    }
+
+    @RequestMapping(value = "/dats")
+    public String data(){
+        return "data";
+    }
+
+
+
+
+
 }
