@@ -3,6 +3,7 @@ package com.daizhihua.sample.entity;
 
 //import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -16,57 +17,55 @@ public class DataEntity  {
 
     private String id ;
 
+    @TableField(value = "samplecode")
     private String samplecode;
 
-    private String longitude;
+    @TableField(value = "xx")
+    private String xx;
 
-    private String latitude;
+    private String yy;
 
-    private String cu;
-
-    private String pb;
-
-    private String zn;
-
-    private String ni;
-
-    private String cr;
-
-    private String cd;
+//    private String latitude;
 
     private String asa;
 
+    private String cd;
+
+    @TableField(value = "cu_hj",exist = true)
+    private String cuHj;
+
+    private String cr;
+
     private String hg;
 
+    private String ni;
+
+    private String pb;
+    @TableField(value = "zn_hj")
+    private String znHj;
+
+    private String ph;
+
+    //环境综合分级
     private String environmental;
 
-    private String mn;
-
-    private String mo;
-
-    private String p;
-
-    private String se;
-
-    private String f;
-
-    private String i;
-
-    private String b;
-
-    private String cl;
-
-    private String s;
 
     private String n;
 
-    private String ca_o;
+    private String p;
 
-    private String fe2_o3;
+    private String k;
+    @TableField(value = "ca_o")
+    private String cao;
+    @TableField(value = "mg_o")
+    private String mgo;
 
-    private String k2_o;
+    private String s;
 
-    private String mg_o;
+    //有机质
+    private String organic;
+    @TableField(value = "fe2_o3")
+    private String fe2o3;
 
     private String c0;
 
@@ -74,23 +73,48 @@ public class DataEntity  {
 
     private String ge;
 
+    private String b;
+
+    private String mo;
+
+    private String mn;
+
+
+    @TableField(value = "cu_yf")
+    private String cuYf;
+    @TableField(value = "zn_yf")
+    private String znYf;
+
+    private String cl;
+    @TableField(value = "si_o2 ")
+    private String sio2;
+
+    private String se;
+
+    private String i;
+
+    private String f;
+
     //养分综合
     private String nutrient;
     //综合分级
     private String comprehensive;
 
-    private String ph;
 
     //区
     private String district;
     //县
     private String street;
-
+    //
     private String community;
-
+    //天气
     private String weather;
 
+    //监测点类型
     private String type;
+
+
+
     //位置
     private String site;
 
@@ -113,20 +137,41 @@ public class DataEntity  {
     private String crop;
     //高程
     private String elevation;
-
+    //监测年度
     private String years;
 
-    private String xx;
+    private String latitude;
 
-    private String yy;
+    private String longitude;
 
     private String environment;
 
     private String if_gather;
 
-    private Date date;
+    private String date;
 
     private String picter;
+
+
+//    private String k2_o;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     @TableField(exist = false)

@@ -101,7 +101,21 @@ $(function(){
         });
     };
 
-
+    jQuery.axgetimage=function(url, data, successfn, errorfn) {
+        data = (data==null || data=="" || typeof(data)=="undefined")? {"date": new Date().getTime()} : data;
+        $.ajax({
+            type: "get",
+            data: data,
+            url: url,
+            dataType:'text',
+            success: function(d){
+                successfn(d);
+            },
+            error: function(e){
+                errorfn(e);
+            }
+        });
+    };
 
 
 });

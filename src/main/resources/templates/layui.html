@@ -1,41 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <title>layDate快速使用</title>
-    <link href="../static/css/BigData.css" rel="stylesheet" type="text/css" />
-    <link href="../static/css/index.css" rel="stylesheet" type="text/css" />
-    <link href="../static/css/index01.css" rel="stylesheet" type="text/css" />
-    <script src="../static/js/jquery.js"></script>
-    <link href="../static/js/bstable/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <link href="../static/js/bstable/css/bootstrap-table.css" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" href="../static/layui/layui_ext/dtree/dtree.css">
-    <link rel="stylesheet" href="../static/layui/layui_ext/dtree/font/dtreefont.css">
-    <link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css"/>
-    <link href="../static/css/Security_operation.css" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" href="static/js/artDialog/skins/default.css" type="text/css"/>
-    <!--<script src="../static/js/laydate.js"></script>-->
-    <script src="../static/js/Home_page.js"></script>
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" />
-    <link rel="stylesheet" href="../static/layui/css/layui.css"  media="all">
-    <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+
 </head>
 <body>
 
-<div class="layui-inline"> <!-- 注意：这一层元素并不是必须的 -->
-    <input type="text"  id="test1">
+<button type="button" onclick="click1()">button1</button>
+<div id="desdiv" style="width: 1000px;height: 400px;">
+    <span>初始化</span>
 </div>
 
-<script src="../static/layui/layui.js"></script>
-<script>
 
-    layui.use('laydate', function(){
-        var laydate = layui.laydate;
-        //执行一个laydate实例
-        laydate.render({
-            elem: '#test1' //指定元素
-        });
-    });
+<script>
+    function click1(){
+        document.getElementById('desdiv').innerHTML = "<iframe src='https://www.daizhihua.cn'"+"style='width: 100%;height: 100%;float: right'"+"></iframe>";
+    }
+
+
 </script>
 </body>
 </html>

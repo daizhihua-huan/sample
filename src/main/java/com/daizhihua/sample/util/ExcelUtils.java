@@ -143,15 +143,8 @@ public class ExcelUtils {
                     String methodName = MethodUtils.setMethodName(field.getName());
                     Method method = classzz.getMethod(methodName, field.getType());
                     if (isDateFied(field)) {
-                        Date date=null;
-                        if(cell!=null){
-                            date=cell.getDateCellValue();
-                        }
-//                        if (date == null) {
-//                            volidateValueRequired(eHead,sheetName,rowIndex);
-//                            break;
-//                        }
-                        method.invoke(instance, cell.getDateCellValue());
+//                        cell.setCellType(CellType.STRING);
+                        method.invoke(instance, getCellValue(cell));
                     } else {
                         String value = null;
                         if(cell!=null){

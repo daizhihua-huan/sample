@@ -1,12 +1,11 @@
 package com.daizhihua.sample.controller;
 
 
+import com.baomidou.mybatisplus.extension.api.R;
 import com.daizhihua.sample.core.Resut;
 import com.daizhihua.sample.dao.*;
-import com.daizhihua.sample.entity.DataEntity;
-import com.daizhihua.sample.entity.GradeCode;
-import com.daizhihua.sample.entity.PointData;
-import com.daizhihua.sample.entity.RegionData;
+import com.daizhihua.sample.entity.*;
+import com.daizhihua.sample.util.DateUtil;
 import com.daizhihua.sample.util.ExcelUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -35,7 +34,155 @@ public class FileController {
     @Autowired
     private GradeCodeMapper gradeCodeMapper;
 
+    @Autowired
+    private ImgTypeMapper imgTypeMapper;
 
+
+    @RequestMapping(value = "/getImage")
+    public void getImage(String type,String year,HttpServletResponse response){
+        Map<String,Object> map = new HashMap<>();
+        map.put("type",type);
+        map.put("year",year);
+        List<ImgTypeEntity> imgTypeEntities = imgTypeMapper.selectByMap(map);
+        if(imgTypeEntities.size()<=0){
+            InputStream in = this.getClass().getResourceAsStream("/static/images/noneshow.png");
+
+           return;
+        }
+        ImgTypeEntity imgTypeEntity = imgTypeEntities.get(0);
+        String path = System.getProperty("user.dir")+"\\"+imgTypeEntity.getPath();
+        File file = new File(path);
+       getByte(file,response);
+        /* response.setContentType("image/gif");
+        FileInputStream fis =null;
+        try {
+            OutputStream out = response.getOutputStream();
+            fis = new FileInputStream(file);
+            byte[] b = new byte[fis.available()];
+            fis.read(b);
+            out.write(b);
+            out.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }*/
+
+    }
+
+
+    @RequestMapping(value = "/getImageFileType")
+    public void getImage(String path,HttpServletResponse response){
+        String filePath = System.getProperty("user.dir")+"\\"+path;
+        File file = new File(filePath);
+        if(!file.exists()){
+            return;
+        }
+        getByte(file,response);
+
+    }
+
+
+
+    public void getByte(File file,HttpServletResponse response){
+        response.setContentType("image/gif");
+        FileInputStream fis =null;
+        try {
+            OutputStream out = response.getOutputStream();
+            fis = new FileInputStream(file);
+            byte[] b = new byte[fis.available()];
+            fis.read(b);
+            out.write(b);
+            out.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /**
+     * 上传图片文件
+     * @param multipartFile
+     * @param type
+     * @param year
+     * @return
+     */
+    @RequestMapping(value = "/sendImageFile",method = RequestMethod.POST)
+    @ResponseBody
+    public Resut sendImageFile(@RequestParam(name = "image")MultipartFile multipartFile,String type,String year,String pid,String imgType){
+
+        if(multipartFile==null){
+            return Resut.error("文件为空请选择上传的文件");
+        }
+        String path = "upload"+"\\"+year+"\\"+pid;
+        String filePath = System.getProperty("user.dir")+"\\"+path;
+        File file = new File(filePath);
+        if(!file.exists()){
+            log.info("文件不存在的话就创建");
+            file.mkdirs();
+        }
+        String fileName = multipartFile.getOriginalFilename();
+        File dest = new File(filePath +"\\"+ fileName);
+
+        try {
+            multipartFile.transferTo(dest);
+            log.info("上传成功");
+            Map<String,Object>map = new HashMap<>();
+            map.put("year",year);
+            map.put("type",type);
+            map.put("pid",pid);
+            map.put("imgType",imgType);
+            List<ImgTypeEntity> imgTypeEntities = imgTypeMapper.selectByMap(map);
+            if(imgTypeEntities.size()>0){
+                ImgTypeEntity imgTypeEntity = imgTypeEntities.get(0);
+                imgTypeEntity.setType(type);
+                imgTypeEntity.setName(fileName);
+                imgTypeEntity.setYear(year);
+                imgTypeEntity.setPath(path+"\\"+fileName);
+                imgTypeEntity.setPid(pid);
+                imgTypeEntity.setImgType(imgType);
+                imgTypeMapper.updateById(imgTypeEntity);
+            }else{
+                ImgTypeEntity imgTypeEntity = new ImgTypeEntity();
+                imgTypeEntity.setName(fileName);
+                imgTypeEntity.setPath(path+"\\"+fileName);
+                imgTypeEntity.setCreateTime(DateUtil.getNewDate());
+                imgTypeEntity.setStatus("0");
+                imgTypeEntity.setType(type);
+                imgTypeEntity.setYear(year);
+                imgTypeEntity.setPid(pid);
+                imgTypeEntity.setImgType(imgType);
+                imgTypeMapper.insert(imgTypeEntity);
+            }
+            return Resut.ok("上传成功");
+        } catch (IOException e) {
+            log.error(e.toString(), e);
+        }
+
+
+        return Resut.ok("上传失败");
+
+    }
+
+
+    /**
+     * 上传监测点
+     * @param multipartFile
+     * @return
+     */
 
     @RequestMapping(value = "/sendFile",method = RequestMethod.POST)
     @ResponseBody
@@ -102,12 +249,12 @@ public class FileController {
         map.put("years",year);
         List<DataEntity> all = dataMapper.selectByMap(map);
         Map<String,Object> mapAll = new HashMap<>();
-        int style1index = 0;
         List<GradeCode> listName = new ArrayList<>();
         List<GradeCode> gradeCodes = gradeCodeMapper.selectByMap(null);
         for (DataEntity dataEntity : all) {
-            String longitude = dataEntity.getLongitude();
-            String latitude = dataEntity.getLatitude();
+            log.info("实体类是"+dataEntity);
+            String longitude = dataEntity.getXx();
+            String latitude = dataEntity.getYy();
             List<String> list = new ArrayList<>();
             list.add(longitude);
             list.add(latitude);
@@ -160,33 +307,6 @@ public class FileController {
         return Resut.ok(testMapper.findByState());
     }
 
-    @GetMapping(value = "/getVideos")
-    public String getVideos(HttpServletRequest request, HttpServletResponse response)
-    {
-        try {
-            FileInputStream fis = null;
-            OutputStream os = null ;
-            fis = new FileInputStream("D:\\test\\localvideo\\out.mp4");
-            int size = fis.available(); // 得到文件大小
-            byte data[] = new byte[size];
-            fis.read(data); // 读数据
-            fis.close();
-            fis = null;
-            response.setContentType("video/mp4"); // 设置返回的文件类型
-            os = response.getOutputStream();
-            os.write(data);
-            os.flush();
-            os.close();
-            os = null;
-
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 
 
 }

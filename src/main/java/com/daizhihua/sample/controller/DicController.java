@@ -31,6 +31,10 @@ public class DicController {
     @Autowired
     private DictPartenMapper dictPartenMapper;
 
+    /**
+     * 获取
+     * @return
+     */
     @RequestMapping("/getDicer")
     public Resut getDic(){
         log.info(dicMapper.selectByMap(null));
@@ -46,11 +50,34 @@ public class DicController {
         return Resut.ok(dicts);
     }
 
+    /**
+     * 重点工区查询
+     * @return
+     */
+    @RequestMapping(value = "/getDicImgType")
+    public Resut getDicImgType(String pid){
+        Map<String,Object> map = new HashMap<>();
+        map.put("pid",pid);
+        List<DictParten> dictPartens = dictPartenMapper.selectByMap(map);
+        for (DictParten dictParten : dictPartens) {
+            Map<String,Object> dicMap = new HashMap<>();
+            dicMap.put("pid",dictParten.getId());
+            dictParten.setChildren(dicMapper.selectByMap(dicMap));
+        }
+        return Resut.ok(dictPartens);
+
+    }
+
+    /**
+     *
+     * @param pid
+     * @return
+     */
     @RequestMapping(value = "/getDicForPid")
     public Resut getDicForPid(String pid){
         Map<String,Object> map = new HashMap<>();
         map.put("pid",pid);
-        return Resut.ok(dictPartenMapper.selectByMap(map));
+        return Resut.ok(dicMapper.selectByMap(map));
     }
 
 }
