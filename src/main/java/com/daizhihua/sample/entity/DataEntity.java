@@ -17,7 +17,7 @@ public class DataEntity  {
 
     private String id ;
 
-    @TableField(value = "samplecode")
+    @TableId(value = "samplecode")
     private String samplecode;
 
     @TableField(value = "xx")
@@ -26,73 +26,81 @@ public class DataEntity  {
     private String yy;
 
 //    private String latitude;
-
+    //4
     private String asa;
-
+    //5
     private String cd;
-
-    @TableField(value = "cu_hj",exist = true)
-    private String cuHj;
-
+    //6
+    @TableField(value = "cu_hj")
+    private String cu_hj;
+    //7
     private String cr;
-
+    //8
     private String hg;
-
+    //9
     private String ni;
-
+    //10
     private String pb;
+    //11
     @TableField(value = "zn_hj")
-    private String znHj;
-
+    private String zn_hj;
+    //12
     private String ph;
 
-    //环境综合分级
+    //环境综合分级 13
     private String environmental;
 
-
+    //14
     private String n;
-
+    //15
     private String p;
-
+    //16
     private String k;
+    //17
     @TableField(value = "ca_o")
-    private String cao;
+    private String ca_o;
+    //18
     @TableField(value = "mg_o")
-    private String mgo;
-
+    private String mg_o;
+    //19
     private String s;
 
-    //有机质
+    //有机质 20
     private String organic;
+    //21
     @TableField(value = "fe2_o3")
-    private String fe2o3;
-
+    private String fe2_o3;
+    //22
     private String c0;
-
+    //23
     private String v;
-
+    //24
     private String ge;
-
+    //25
     private String b;
-
+    //26
     private String mo;
+
+    //27
 
     private String mn;
 
-
+    //28
     @TableField(value = "cu_yf")
-    private String cuYf;
+    private String cu_yf;
+    //29
     @TableField(value = "zn_yf")
-    private String znYf;
-
+    private String zn_yf;
+    //30
     private String cl;
+    //31
     @TableField(value = "si_o2 ")
-    private String sio2;
-
+    private String si_o2;
+    //32
     private String se;
-
+    //33
     private String i;
-
+    //34
     private String f;
 
     //养分综合

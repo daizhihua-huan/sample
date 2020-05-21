@@ -3,18 +3,35 @@
 <head>
 
 </head>
+<style>
+    .make{
+        display: flex;
+        flex-direction: column;
+        background: rgb(39,39,39);
+        width:fit-content;
+        width:-moz-fit-content;
+        color: #d2d2d2;
+    }
+</style>
 <body>
-
-<button type="button" onclick="click1()">button1</button>
-<div id="desdiv" style="width: 1000px;height: 400px;">
-    <span>初始化</span>
+<div class="make">
+    <label>编号：<span>e.data.samplecode</span></label>
+    <div style="border-top:1px dashed #cccccc;height: 1px;overflow:hidden"></div>
+    <div style=" display: flex;
+        flex-direction: row;">
+        <label style="margin-right: 10px">采样经度：<span>e.data.longitude</span></label>
+        <label>采样经度：<span>e.sadsadsadsa</span></label>
+    </div>
+    <div style="border-top:1px dashed #cccccc;height: 1px;overflow:hidden"></div>
+    <label>采样纬度：<span>data.latitude</span></label>
+    <div style="border-top:1px dashed #cccccc;height: 1px;overflow:hidden"></div>
+    <label>土壤质地：<span>solitype</span></label>
+    <div style="border-top:1px dashed #cccccc;height: 1px;overflow:hidden"></div>
+    <label>环境描述：<span>environment</span></label>
 </div>
 
 
 <script>
-    function click1(){
-        document.getElementById('desdiv').innerHTML = "<iframe src='https://www.daizhihua.cn'"+"style='width: 100%;height: 100%;float: right'"+"></iframe>";
-    }
 
 
 </script>

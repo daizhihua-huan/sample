@@ -29,7 +29,10 @@ public class DataController {
     public String data(){
         return "data";
     }
-
+    @RequestMapping("/login")
+    public String userLogin() {
+        return "login";
+    }
 
 
 

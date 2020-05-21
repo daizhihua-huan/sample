@@ -1,16 +1,20 @@
 package com.daizhihua.sample.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.api.R;
 import com.daizhihua.sample.core.Resut;
 import com.daizhihua.sample.dao.*;
 import com.daizhihua.sample.entity.*;
 import com.daizhihua.sample.util.DateUtil;
 import com.daizhihua.sample.util.ExcelUtils;
+import com.daizhihua.sample.util.NumberUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,6 +41,8 @@ public class FileController {
     @Autowired
     private ImgTypeMapper imgTypeMapper;
 
+    private List<DataEntity> list;
+
 
     @RequestMapping(value = "/getImage")
     public void getImage(String type,String year,HttpServletResponse response){
@@ -52,27 +58,7 @@ public class FileController {
         ImgTypeEntity imgTypeEntity = imgTypeEntities.get(0);
         String path = System.getProperty("user.dir")+"\\"+imgTypeEntity.getPath();
         File file = new File(path);
-       getByte(file,response);
-        /* response.setContentType("image/gif");
-        FileInputStream fis =null;
-        try {
-            OutputStream out = response.getOutputStream();
-            fis = new FileInputStream(file);
-            byte[] b = new byte[fis.available()];
-            fis.read(b);
-            out.write(b);
-            out.flush();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (fis != null) {
-                try {
-                    fis.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }*/
+        getByte(file,response);
 
     }
 
@@ -198,41 +184,50 @@ public class FileController {
         }
 
         try {
-            List<DataEntity> dataEntities = ExcelUtils.readExcelToEntity(DataEntity.class, multipartFile.getInputStream(), name);
-            System.out.println(dataEntities);
-            for (DataEntity dataEntity : dataEntities) {
+            list = ExcelUtils.readExcelToEntity(DataEntity.class, multipartFile.getInputStream(), name);
+//            List<DataEntity> dataEntities = ExcelUtils.readExcelToEntity(DataEntity.class, multipartFile.getInputStream(), name);
+            System.out.println(list);
+            for (DataEntity dataEntity : list) {
                 if(dataEntity.getId()==null){
                     continue;
                 }
-                //dataEntity.setDataId(0L);
                 System.out.println(dataEntity);
-                dataMapper.insert(dataEntity);
-                /*if(dataEntity.getType().equals("区域监测")){
-                    RegionData regionData = new RegionData();
-                    BeanUtils.copyProperties(dataEntity, regionData);
-                    regionDataMapper.insert(regionData);
+                DataEntity dataEntity1 = dataMapper.selectById(dataEntity.getSamplecode());
+                if(dataEntity1==null){
+                    dataMapper.insert(dataEntity);
                 }else{
-                    PointData pointData = new PointData();
-                    BeanUtils.copyProperties(dataEntity,pointData);
-                    pointDataMapper.insert(pointData);
-                }*/
-//                dataMapper.insert(dataEntity);
+                    return Resut.error(202);
+                }
+
             }
-//            dataMapper.saveAll(dataEntities);
-            log.info("数据是"+dataEntities);
-//            ExcleUtile.analisy(name.substring(name.indexOf(".")+1),multipartFile.getInputStream());
+            log.info("数据是"+list);
         } catch (IOException e) {
             e.printStackTrace();
             return Resut.error("文件模板错误");
         } catch (Exception e) {
             e.printStackTrace();
-            return Resut.error("文件模板错误");
+            return Resut.error("文件中的id和数据库重复");
         }
 //        multipartFile.getInputStream()
 
-        return Resut.ok();
-
+        return Resut.ok("上传成功");
     }
+
+    @RequestMapping(value = "/updateData",method = RequestMethod.GET)
+    @ResponseBody
+    public Resut updateData(){
+        for (DataEntity dataEntity : list) {
+            System.out.println(dataEntity);
+            DataEntity dataEntity1 = dataMapper.selectById(dataEntity.getSamplecode());
+            if(dataEntity1==null){
+                dataMapper.insert(dataEntity);
+            }else{
+                dataMapper.updateById(dataEntity1);
+            }
+        }
+        return Resut.ok();
+    }
+
 
     /**
      * 1.通过数据字典获取类型
@@ -243,59 +238,100 @@ public class FileController {
      */
     @RequestMapping(value = "/getData")
     @ResponseBody
-    public Resut getData(String name, int index,String type,String year) throws IllegalAccessException {
-        Map<String,Object> map = new HashMap<>();
-        map.put("type",type);
-        map.put("years",year);
-        List<DataEntity> all = dataMapper.selectByMap(map);
+    public Resut getData(String name, Integer index,String type,String year) throws IllegalAccessException {
         Map<String,Object> mapAll = new HashMap<>();
         List<GradeCode> listName = new ArrayList<>();
-        List<GradeCode> gradeCodes = gradeCodeMapper.selectByMap(null);
-        for (DataEntity dataEntity : all) {
-            log.info("实体类是"+dataEntity);
-            String longitude = dataEntity.getXx();
-            String latitude = dataEntity.getYy();
-            List<String> list = new ArrayList<>();
-            list.add(longitude);
-            list.add(latitude);
-            Field[] fields = dataEntity.getClass().getDeclaredFields();
-            fields[index].setAccessible(true);
-            if(fields[index].getName().equals(name)){
-                for (GradeCode gradeCode : gradeCodes) {
-                    if(fields[index].get(dataEntity).equals(gradeCode.getName())){
-                        dataEntity.setStyle(Integer.parseInt(gradeCode.getIndexCode()));
-                        if (listName.indexOf(gradeCode)==-1){
-                            listName.add(gradeCode);
-                        }
+        if(StringUtils.isEmpty(year)){
+            return Resut.ok(getDataForTotal(type));
+        }else{
+            Map<String,Object> map = new HashMap<>();
+            map.put("type",type);
+            map.put("years",year);
+            List<DataEntity> all = dataMapper.selectByMap(map);
 
+            List<String> elements = dataMapper.getElement(name,type,year);
+            elements.sort(new Comparator<String>() {
+                @Override
+                public int compare(String o1, String o2) {
+                    String name1 = o1.substring(0,1);
+                    String name2 = o2.substring(0,1);
+                    //String s =
+                    int number1 = 0;
+                    int number2 = 0;
+                    if(!StringUtils.isEmpty(NumberUtil.toNumber(name1))){
+                        number1 = Integer.parseInt(NumberUtil.toNumber(name1));
+                    }
+                    if(!StringUtils.isEmpty(NumberUtil.toNumber(name2))){
+                        number2 = Integer.parseInt(NumberUtil.toNumber(name2));
+                    }
+                    return number1-number2;
+                }
+            });
+            List<GradeCode> gradeCodes = gradeCodeMapper.selectByMap(null);
+            for (DataEntity dataEntity : all) {
+                String longitude = dataEntity.getXx();
+                String latitude = dataEntity.getYy();
+                List<String> list = new ArrayList<>();
+                list.add(longitude);
+                list.add(latitude);
+                Field[] fields = dataEntity.getClass().getDeclaredFields();
+                fields[index].setAccessible(true);
+                if(fields[index].getName().equals(name)){
+                    for (int i = 0; i < elements.size(); i++) {
+                        //如果值相等
+                        if(elements.get(i).equals(fields[index].get(dataEntity))){
+                            dataEntity.setStyle(i);
+                            gradeCodes.get(i).setName(elements.get(i));
+                            if (listName.indexOf(gradeCodes.get(i))==-1){
+                                listName.add(gradeCodes.get(i));
+                            }
+                        }
                     }
                 }
-
-
-               /* if(fields[index].get(dataEntity).equals("一级")){
-                    dataEntity.setStyle(0);
-                    listName.add(fields[index].get(dataEntity).toString());
-                }else if(fields[index].get(dataEntity).equals("二级")){
-                    dataEntity.setStyle(1);
-                    listName.add(fields[index].get(dataEntity).toString());
-                }else if(fields[index].get(dataEntity).equals("三级")){
-                    dataEntity.setStyle(2);
-                    listName.add(fields[index].get(dataEntity).toString());
-                }else if(fields[index].get(dataEntity).equals("四级")){
-                    dataEntity.setStyle(3);
-                    listName.add(fields[index].get(dataEntity).toString());
-                }else{
-                    dataEntity.setStyle(4);
-                    listName.add(fields[index].get(dataEntity).toString());
-                }*/
+                dataEntity.setLnglat(list);
             }
-            dataEntity.setLnglat(list);
+            Collections.sort(listName);
+            mapAll.put("data",all);
+            mapAll.put("listName",listName);
+            mapAll.put("years",year);
+
+            return Resut.ok(mapAll);
         }
-        Collections.sort(listName);
-        mapAll.put("data",all);
-        mapAll.put("listName",listName);
-        return Resut.ok(mapAll);
+
     }
+
+
+    public Map<String,Object> getDataForTotal(String type){
+        Map<String,Object> mapAll = new HashMap<>();
+        List<Map<String, Object>> totalTypeForYears = dataMapper.getTotalTypeForYears(type);
+        String year;
+        if(totalTypeForYears.size()>0&& totalTypeForYears!=null){
+            Map<String, Object> map = totalTypeForYears.get(0);
+            year = map.get("years").toString();
+            List<DataEntity> dataEntities = dataMapper.selectList(
+                    new QueryWrapper<DataEntity>()
+                    .eq("type", type)
+                    .eq("years", map.get("years"))
+            );
+
+            for (DataEntity dataEntity : dataEntities) {
+                String longitude = dataEntity.getXx();
+                String latitude = dataEntity.getYy();
+                List<String> list = new ArrayList<>();
+                list.add(longitude);
+                list.add(latitude);
+                dataEntity.setLnglat(list);
+//                dataEntity.setStyle(0);
+            }
+            mapAll.put("data",dataEntities);
+            mapAll.put("listName",new ArrayList<>());
+            mapAll.put("years",year);
+        }
+
+        return mapAll;
+
+    }
+
 
     @RequestMapping(value = "/test",method = RequestMethod.GET)
     @ResponseBody

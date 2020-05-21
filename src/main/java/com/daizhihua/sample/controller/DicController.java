@@ -1,5 +1,8 @@
 package com.daizhihua.sample.controller;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.daizhihua.sample.core.Resut;
 import com.daizhihua.sample.dao.DicMapper;
 import com.daizhihua.sample.dao.DictPartenMapper;
@@ -14,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.sql.Wrapper;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +34,7 @@ public class DicController {
     private DictPartenMapper dictPartenMapper;
 
     /**
-     * 获取
+     * 获取 元素指标
      * @return
      */
     @RequestMapping("/getDicer")
@@ -42,10 +44,11 @@ public class DicController {
         map.put("pid","0");
         List<DictParten> dicts = dictPartenMapper.selectByMap(map);
         for (DictParten dict : dicts) {
-            Map<String,Object> dicmap = new HashMap<>();
             String pid = dict.getId();
-            dicmap.put("pid",pid);
-            dict.setChildren(dicMapper.selectByMap(dicmap));
+            List<Dict> dicts1 = dicMapper.selectList(new QueryWrapper<Dict>()
+                    .eq("pid", pid)
+                    .orderBy(true,true,"sort_no"));
+            dict.setChildren(dicts1);
         }
         return Resut.ok(dicts);
     }

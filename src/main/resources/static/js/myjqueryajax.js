@@ -101,6 +101,28 @@ $(function(){
         });
     };
 
+    jQuery.axgetbefore=function(url, data,before,successfn, errorfn,complete) {
+        data = (data==null || data=="" || typeof(data)=="undefined")? {"date": new Date().getTime()} : data;
+        $.ajax({
+            type: "get",
+            data: data,
+            url: url,
+            dataType: "json",
+            beforeSend :function(){
+                before()
+            },
+            success: function(d){
+                successfn(d);
+            },
+            error: function(e){
+                errorfn(e);
+            },
+            complete:function () {
+                complete()
+            }
+        });
+    };
+
     jQuery.axgetimage=function(url, data, successfn, errorfn) {
         data = (data==null || data=="" || typeof(data)=="undefined")? {"date": new Date().getTime()} : data;
         $.ajax({

@@ -16,6 +16,9 @@ import java.util.Map;
 
 public interface DataMapper  extends BaseMapper<DataEntity> {
 
+    @Select("select ${name} as name from dataentity where type='${type}' and years ='${year}' group by ${name}")
+    List<String> getElement(@Param("name") String name,@Param("type")String type,@Param("year")String year);
+
 
     @Select("select * from soucedata")
     List<DataEntity> getAll();
@@ -53,6 +56,9 @@ public interface DataMapper  extends BaseMapper<DataEntity> {
 
     @Select("select ${name} as name,count(id) as data from dataentity where type='${type}' and years='${year}' group by ${name}")
     List<Map<String,Object>>getNameCount(@Param("name")String name,@Param("type")String type,@Param("year")String year);
+
+    @Select("select count(id) as total,years from dataentity where type = '${type}' group by years order by total desc")
+    List<Map<String,Object>>getTotalTypeForYears(@Param("type")String type);
 
     /*@Insert({
             "<script>",

@@ -182,7 +182,7 @@ function AnQuan() {
                 enabled: false
             },
             title: {
-                text: '监测点数量统计图'
+                text: null
             },
             xAxis: {
                 type: 'category'
@@ -222,9 +222,7 @@ function AnQuan() {
         var data = res.data;
         var chart = Highcharts.chart('nutrientContainer', {
             title: {
-                text: '养分综合<br>占比',
-                align: 'center',
-                verticalAlign: 'middle',
+                text: null
             },
             credits: {
                 enabled: false
@@ -234,19 +232,23 @@ function AnQuan() {
                 pointFormat: '{point.name}: <b>{point.percentage:.1f}%</b>'
             },
             plotOptions: {
+
                 pie: {
+                    allowPointSelect: true,
+                    showInLegend: false,
+                    cursor: 'pointer',
                     dataLabels: {
+                        format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                        showInLegend: true,
                         enabled: true,
-                        distance: -50,
                         style: {
                             fontWeight: 'bold',
-                            color: 'white',
-                            textShadow: '0px 1px 2px black'
+                            // color: 'white',
+                            textShadow: '0px 1px 1px black'
                         }
                     },
                     startAngle: -180, // 圆环的开始角度
                     endAngle: 180,    // 圆环的结束角度
-                    // center: ['50%', '75%']
                 }
             },
             series: [{
@@ -264,9 +266,7 @@ function AnQuan() {
         var data = res.data;
         var chart = Highcharts.chart('environmentContainer', {
             title: {
-                text: '环境综合<br>占比',
-                align: 'center',
-                verticalAlign: 'middle',
+                text: null
             },
             credits: {
                 enabled: false
@@ -276,24 +276,40 @@ function AnQuan() {
                 pointFormat: '{point.name}: <b>{point.percentage:.1f}%</b>'
             },
             plotOptions: {
+
+
                 pie: {
+                    allowPointSelect: true,
+                    showInLegend: false,
+                    cursor: 'pointer',
                     dataLabels: {
+                        format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                        showInLegend: true,
                         enabled: true,
-                        distance: -50,
                         style: {
-                            fontWeight: 'bold',
-                            color: 'white',
-                            textShadow: '0px 1px 2px black'
+                             fontWeight: 'bold',
+                            // color: 'white',
+                            textShadow: '0px 1px 1px black'
                         }
                     },
                     startAngle: -180, // 圆环的开始角度
                     endAngle: 180,    // 圆环的结束角度
+                   /* allowPointSelect: false,
+                    showInLegend: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                        style: {
+                            color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                        }
+                    }*/
                     // center: ['50%', '75%']
                 }
             },
             series: [{
                 type: 'pie',
-                name: '养分综合占比',
+                name: '环境综合占比',
                 innerSize: '50%',
                 data: data
             }]
@@ -312,7 +328,7 @@ function AnQuan() {
                 enabled: false
             },
             title: {
-                text: '土地利用监测点数量统计图'
+                text: null
             },
             xAxis: {
                 type: 'category'
@@ -360,7 +376,7 @@ function AnQuan() {
                 type: 'column'
             },
             title: {
-                text: '百分比堆叠柱形图'
+                text: null
             },
             credits: {
                 enabled: false
@@ -399,7 +415,7 @@ function AnQuan() {
                 type: 'column'
             },
             title: {
-                text: '养分指标柱形图'
+                text: null
             },
             credits: {
                 enabled: false
@@ -438,7 +454,7 @@ function AnQuan() {
                 type: 'column'
             },
             title: {
-                text: '养分指标柱形图'
+                text: null
             },
             credits: {
                 enabled: false
@@ -495,13 +511,17 @@ function getregionalism(data) {
             },
             plotOptions: {
                 pie: {
+                    allowPointSelect: true,
+                    showInLegend: false,
+                    cursor: 'pointer',
                     dataLabels: {
+                        format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                        showInLegend: true,
                         enabled: true,
-                        distance: -50,
                         style: {
                             fontWeight: 'bold',
-                            color: 'white',
-                            textShadow: '0px 1px 2px black'
+                            // color: 'white',
+                            textShadow: '0px 1px 1px black'
                         }
                     },
                     startAngle: -180, // 圆环的开始角度
@@ -539,23 +559,26 @@ function getregionalism(data) {
             },
             plotOptions: {
                 pie: {
+                    allowPointSelect: true,
+                    showInLegend: false,
+                    cursor: 'pointer',
                     dataLabels: {
+                        format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                        showInLegend: true,
                         enabled: true,
-                        distance: -50,
                         style: {
                             fontWeight: 'bold',
-                            color: 'white',
-                            textShadow: '0px 1px 2px black'
+                            // color: 'white',
+                            textShadow: '0px 1px 1px black'
                         }
                     },
                     startAngle: -180, // 圆环的开始角度
                     endAngle: 180,    // 圆环的结束角度
-                    // center: ['50%', '75%']
                 }
             },
             series: [{
                 type: 'pie',
-                name: '养分综合占比',
+                name: '环境综合占比',
                 innerSize: '50%',
                 data: list
             }]
@@ -576,7 +599,7 @@ function getregionalism(data) {
                 enabled: false
             },
             title: {
-                text: '土地利用监测点数量统计图'
+                text: null
             },
             xAxis: {
                 type: 'category'

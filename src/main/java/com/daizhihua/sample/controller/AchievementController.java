@@ -1,5 +1,6 @@
 package com.daizhihua.sample.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.daizhihua.sample.core.Resut;
 import com.daizhihua.sample.dao.DataMapper;
 import com.daizhihua.sample.dao.DicMapper;
@@ -12,6 +13,7 @@ import com.daizhihua.sample.util.NumberUtil;
 import lombok.extern.log4j.Log4j;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -105,9 +107,9 @@ public class AchievementController {
      */
     @RequestMapping(value = "/getNameCount")
     public Resut getNameCount(String type,String year,String pid){
-        Map<String,Object> map = new HashMap<>();
-        map.put("pid",pid);
-        List<Dict> dicts = dicMapper.selectByMap(map);
+        List<Dict> dicts  = dicMapper.selectList(new QueryWrapper<Dict>()
+                .eq("pid", pid)
+                .orderBy(true,true,"sort_no"));;
         Map<String,Object>resultMap = new HashMap<>();
         /**
          * 存放名字的集合
@@ -154,14 +156,20 @@ public class AchievementController {
             @Override
             public int compare(Map<String, Object> o1, Map<String, Object> o2) {
 
-                String name1 = o2.get("name").toString().substring(0,1);
-                int number1 = Integer.parseInt(NumberUtil.toNumber(name1));
-                log.info("name1的值"+name1.charAt(0));
-                String name2 = o1.get("name").toString().substring(0,1);
-                int number2 = Integer.parseInt(NumberUtil.toNumber(name2));
-                log.info("name2的值"+name2);
-                log.info(number2-number1);
-                return  number2-number1;
+                String name1 = o1.get("name").toString().substring(0,1);
+//                log.info("name1是：{}",name1);
+                int number1 = 0;
+                int number2 = 0;
+                if(!StringUtils.isEmpty(NumberUtil.toNumber(name1))){
+                    number1 = Integer.parseInt(NumberUtil.toNumber(name1));
+                }
+
+                String name2 = o2.get("name").toString().substring(0,1);
+//                log.info("name2的值:{}",name2);
+                if(!StringUtils.isEmpty(NumberUtil.toNumber(name2))){
+                    number2 = Integer.parseInt(NumberUtil.toNumber(name2));
+                }
+                return  number1-number2;
 
             }
         });

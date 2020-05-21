@@ -1,5 +1,6 @@
 package com.daizhihua.sample.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -15,11 +16,12 @@ public class GradeCode  implements Comparable<GradeCode>{
 
     private String url;
 
+    @TableField(value = "index_code")
     private String indexCode;
 
     @Override
     public int compareTo(GradeCode o) {
-        int i = Integer.parseInt(this.getId()) - Integer.parseInt(o.getId());
+        int i =  Integer.parseInt(this.indexCode)-Integer.parseInt(o.getIndexCode());
         return i;
     }
 

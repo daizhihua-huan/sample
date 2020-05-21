@@ -61,6 +61,11 @@ public class Resut implements Serializable {
         return resut("error",ERROR);
     }
 
+    //请求失败 不返回数据调用
+    public static Resut error(int status){
+        return resut("error",status);
+    }
+
     //数据请求成功且有数据调用
     public static Resut ok(Object data){
         return resut(data,SUCESS);

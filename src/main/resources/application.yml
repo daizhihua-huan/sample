@@ -1,11 +1,11 @@
 
 server:
   port: 8090
-mymybatis-plus:
+mybatis-plus:
   configuration:
-    call-setters-on-nulls: true
+#    call-setters-on-nulls: true
     #解决，查询返回结果含null没有对应字段值问题
-
+    map-underscore-to-camel-case: false
 management:
   endpoints:
     web:
@@ -38,14 +38,13 @@ spring:
       #配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
       time-between-eviction-runs-millis: 60000
       min-evictable-idle-time-millis: 300000
-      max-evictable-idle-time-millis: 900000
-      validation-query: SELECT
       test-while-idle: true
       test-on-borrow: false
       test-on-return: false
       # 打开PSCache，并且指定每个连接上PSCache的大小
       pool-prepared-statements: true
       max-pool-prepared-statement-per-connection-size: 20
+      #配置监控统计拦截的filters,去掉后监控界面sql将无法统计
       filters: stat,wall,log4j
       # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
       # 合并多个DruidDataSource的监控数据
@@ -66,12 +65,16 @@ spring:
         reset-enable: false
           # 登录的后台的用户名,密码
         login-username: admin
+
         login-password: admin
         # 访问控制，可以配置allow和deny这两个参数
         # 配置格式 ip或者ip/子网掩码(24) 例如   192.168.2.112 ,192.168.2.112/24
         # 注意 由于匹配规则不支持IPV6，配置了allow或者deny之后，会导致IPV6无法访问。
         # allow:
         # deny:
+      filter:
+        stat:
+          log-slow-sql: true
 
   mvc:
     static-path-pattern: /resources/**
