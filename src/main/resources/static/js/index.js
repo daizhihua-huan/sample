@@ -3,23 +3,32 @@
  */
 
 $(function(){
+
+
+
+
     // index();
     $(".index_nav ul li").each(function(index){
         $(this).click(function(){
             $(this).addClass("nav_active").siblings().removeClass("nav_active");
             $(".index_tabs .inner").eq(index).fadeIn().siblings("div").stop().hide();
             if(index==0){
-                console.log(index)
+                console.log(index);
+                getdtree(layui.dtree,index)
             }else if(index==1){
                 console.log(1);
+                getdtree(layui.dtree,index)
             }else if(index==2){
                 console.log(2)
 
             }else if(index==3){
+                $(".spanYear").html($("#date").val());
                 AnQuan();
             }else if(index==4){
+
                 user();
             }else if(index==5){
+                $(".spanYear").html($("#date").val());
                 manage();
             }
         })
@@ -40,9 +49,766 @@ $(function(){
 
 });
 
+layui.extend({
+    dtree: '../static/layui/layui_ext/dtree/dtree'
+}).use(['upload','element','dtree','laydate'], function(){
+    var $ = layui.jquery
+    upload = layui.upload,element = layui.element;
+    var dtree = layui.dtree;
+    var laydate = layui.laydate;
+    //常规用法yyyy年MM月dd日HH时mm分ss秒
+    getdtree(dtree,0);
+    $.ax("/getDicForPid",
+        {pid: '1'},
+        null,
+        null,
+        null,
+        function(res){
+            layui.dtree.render({
+                elem: "#toolbarDiv2",
+                data: res.data,
+                record:true,
+                checkbar: true,
+                checkbarType: "only", // 默认就是all，其他的值为： no-all  p-casc   self  only
+                checkbarFun: {
+                    chooseDone: function(checkbarNodesParam) { //复选框点击事件完毕后，返回该树关于复选框操作的全部信息。
+                        console.log(checkbarNodesParam[0]);
+                        var data = checkbarNodesParam[0];
+                        if(data.context=='全市'){
+                            $("#cityregion").attr("style","display:none;")
+                            $("#citypoint").attr("style","display:block")
+                        }else{
+                            $("#cityregion").attr("style","display:block;")
+                            $("#citypoint").attr("style","display:none");
+                            $("#citynutrient").text(data.context+"养分综合分级各等级占比统计图");
+                            $("#cityenvironment").text(data.context+"环境综合分级各等级占比统计图");
+                            $("#cityland").text(data.context+"土地利用类型监测点数量统计图");
+                            getregionalism(data);
+                        }
+                    }
+                }
+            });
+        },
+        function(error){
+            alert("出错了");
+        }
+    );
+
+
+
+    laydate.render({
+        elem: '#date'
+        ,type: 'year'
+        ,max: new Date().getTime()
+        // ,value: new Date()
+        ,isInitValue: true
+        ,done:function (value) {
+            var elem = "toolbarDiv";
+            var type = "区域监测";
+            if(indexflag==1){
+                elem = "toolbarDiv1";
+                type="重点监测";
+            }
+            var params = dtree.getCheckbarNodesParam(elem);
+            console.log(params)
+            var data = {
+                type:type,
+                year: value
+            };
+            if(params.length>0){
+                data.name = params[0].recordData.dataCode;
+                data.index = params[0].recordData.dataIndex;
+            }
+            getajax(data,0)
+        }
+        ,finally:function () {
+
+        }
+    });
+    laydate.render({
+        elem: '#yearDate'
+        , type: 'year'
+        , max: new Date().getTime()
+        , value: new Date()
+        , isInitValue: true
+        , done: function (value) {
+
+        }
+        , finally: function () {
+
+        }
+    });
+
+    //重点工区的上传
+    laydate.render({
+        elem: '#yearPoint'
+        , type: 'year'
+        , max: new Date().getTime()
+        , value: new Date()
+        , isInitValue: true
+        , done: function (value) {
+
+        }
+        , finally: function () {
+
+        }
+    });
+    var msg ;
+    //选完文件后不自动上传
+    upload.render({
+        elem: '#test8'
+        ,url: '/sendFile' //改成您自己的上传接口
+        ,auto: false
+        ,accept:'file'
+        ,exts:'xls|xlsx'
+        ,field:'file'
+        //,multiple: true
+        ,bindAction: '#test9'
+        ,before:function (res) {
+            msg = layer.msg('正在保存数据...', {icon: 16,shade: [0.5, '#f5f5f5'],scrollbar: false,offset: 'auto',time:false})
+        }
+        ,progress: function(n, elem) {
+            console.log(elem)
+            var percent = n + '%' //获取进度百分比
+            console.log(percent)
+            element.progress('demo', percent); //可配合 layui 进度条元素使用
+        }
+        ,done: function(res){
+            console.log(res)
+            if(res.status==201){
+                layer.msg(res.data,{time: 1200},function () {
+                    element.progress('demo', '0%'); //可配合 layui 进度条元素使用
+                });
+                layer.close(msg);
+            }else if(res.status==202){
+                layer.close(msg);
+                var confirm = layer.confirm('编码重复,是否更新数据？', {
+                    btn: ['是','否'] //按钮
+                }, function(){
+                    // layer.msg('的确很重要', {icon: 1});
+                    layer.close(confirm)
+                    var index;
+                    jQuery.axgetbefore("/updateData","",function () {
+                        index = layer.msg('正在更新数据...', {icon: 16,shade: [0.5, '#f5f5f5'],scrollbar: false,offset: 'auto',time:false})
+                    },function (res) {
+                        layer.msg(res.data,{time: 1200},function () {
+                            element.progress('demo', '0%'); //可配合 layui 进度条元素使用
+                        });
+                    },function (error) {
+                        layer.msg(error,{time: 1200},function () {
+                            element.progress('demo', '0%'); //可配合 layui 进度条元素使用
+                        });
+                    },function () {
+                        layer.close(index);
+                    })
+                }, function(){
+                    element.progress('demo', '0%'); //可配合 layui 进度条元素使用
+                });
+            }else {
+                layer.msg(res.data,{time: 1200},function () {
+                    element.progress('demo', '0%'); //可配合 layui 进度条元素使用
+                });
+                layer.close(msg);
+            }
+
+
+
+        }
+    });
+    //选完文件后不自动上传
+    upload.render({
+        elem: '#image1'
+        , url: '/sendImageFile' //改成您自己的上传接口
+        , accept: 'images'
+        , field: 'image'
+        ,auto: false
+        , bindAction: '#imageupload'
+        , before:function (res) {
+            this.data={
+                type:'0',
+                year:$("#yearDate").val(),
+                pid:'0'
+            }
+
+        }
+        , progress: function (n, elem) {
+            console.log(elem)
+            var percent = n + '%' //获取进度百分比
+            console.log(percent)
+            element.progress('imageplan', percent); //可配合 layui 进度条元素使用
+
+        }
+        , done: function (res) {
+            console.log(res);
+
+            layer.msg('上传成功',{time: 1800},function () {
+                element.progress('imageplan', '0%'); //可配合 layui 进度条元素使用
+            });
+
+        },
+    });
+
+});
+
+function getCity(map) {
+    map.plugin('AMap.DistrictSearch', function () {
+        // 创建行政区查询对象
+        var district = new AMap.DistrictSearch({
+            // 返回行政区边界坐标等具体信息
+            extensions: 'all',
+            // 设置查询行政区级别为 区
+            level: 'district'
+        })
+        var fillOpacity = 0.1;
+        district.search('朝阳区', function(status, result) {
+            // 获取朝阳区的边界信息
+            var bounds = result.districtList[0].boundaries
+            var polygons = []
+            if (bounds) {
+                for (var i = 0, l = bounds.length; i < l; i++) {
+                    //生成行政区划polygon
+                    var polygon = new AMap.Polygon({
+                        map: map,
+                        strokeWeight: 1,
+                        path: bounds[i],
+                        fillOpacity: fillOpacity,
+                        fillColor: '#CCF3FF',
+                        strokeColor: '#0000FF'
+                    })
+                    polygons.push(polygon)
+                }
+                // 地图自适应
+                map.setFitView()
+            }
+        })
+        district.search('东城区', function(status, result) {
+            // 获取朝阳区的边界信息
+            var bounds = result.districtList[0].boundaries
+            var polygons = []
+            if (bounds) {
+                for (var i = 0, l = bounds.length; i < l; i++) {
+                    //生成行政区划polygon
+                    var polygon = new AMap.Polygon({
+                        map: map,
+                        strokeWeight: 1,
+                        path: bounds[i],
+                        fillOpacity: fillOpacity,
+                        fillColor: '#CCF3FF',
+                        strokeColor: '#0000FF'
+                    })
+                    polygons.push(polygon)
+                }
+                // 地图自适应
+                map.setFitView()
+            }
+        })
+        district.search('西城区', function(status, result) {
+            // 获取朝阳区的边界信息
+            var bounds = result.districtList[0].boundaries
+            var polygons = []
+            if (bounds) {
+                for (var i = 0, l = bounds.length; i < l; i++) {
+                    //生成行政区划polygon
+                    var polygon = new AMap.Polygon({
+                        map: map,
+                        strokeWeight: 1,
+                        path: bounds[i],
+                        fillOpacity: fillOpacity,
+                        fillColor: '#CCF3FF',
+                        strokeColor: '#0000FF'
+                    })
+                    polygons.push(polygon)
+                }
+                // 地图自适应
+                map.setFitView()
+            }
+        })
+        district.search('房山区', function(status, result) {
+            // 获取朝阳区的边界信息
+            var bounds = result.districtList[0].boundaries
+            var polygons = []
+            if (bounds) {
+                for (var i = 0, l = bounds.length; i < l; i++) {
+                    //生成行政区划polygon
+                    var polygon = new AMap.Polygon({
+                        map: map,
+                        strokeWeight: 1,
+                        path: bounds[i],
+                        fillOpacity: fillOpacity,
+                        fillColor: '#CCF3FF',
+                        strokeColor: '#0000FF'
+                    })
+                    polygons.push(polygon)
+                }
+                // 地图自适应
+                map.setFitView()
+            }
+        })
+        district.search('海淀区', function(status, result) {
+            // 获取朝阳区的边界信息
+            var bounds = result.districtList[0].boundaries
+            var polygons = []
+            if (bounds) {
+                for (var i = 0, l = bounds.length; i < l; i++) {
+                    //生成行政区划polygon
+                    var polygon = new AMap.Polygon({
+                        map: map,
+                        strokeWeight: 1,
+                        path: bounds[i],
+                        fillOpacity: fillOpacity,
+                        fillColor: '#CCF3FF',
+                        strokeColor: '#0000FF'
+                    })
+                    polygons.push(polygon)
+                }
+                // 地图自适应
+                map.setFitView()
+            }
+        })
+        district.search('丰台区', function(status, result) {
+            // 获取朝阳区的边界信息
+            var bounds = result.districtList[0].boundaries
+            var polygons = []
+            if (bounds) {
+                for (var i = 0, l = bounds.length; i < l; i++) {
+                    //生成行政区划polygon
+                    var polygon = new AMap.Polygon({
+                        map: map,
+                        strokeWeight: 1,
+                        path: bounds[i],
+                        fillOpacity: fillOpacity,
+                        fillColor: '#CCF3FF',
+                        strokeColor: '#0000FF'
+                    })
+                    polygons.push(polygon)
+                }
+                // 地图自适应
+                map.setFitView()
+            }
+        })
+        district.search('石景山区', function(status, result) {
+            // 获取朝阳区的边界信息
+            var bounds = result.districtList[0].boundaries
+            var polygons = []
+            if (bounds) {
+                for (var i = 0, l = bounds.length; i < l; i++) {
+                    //生成行政区划polygon
+                    var polygon = new AMap.Polygon({
+                        map: map,
+                        strokeWeight: 1,
+                        path: bounds[i],
+                        fillOpacity: fillOpacity,
+                        fillColor: '#CCF3FF',
+                        strokeColor: '#0000FF'
+                    })
+                    polygons.push(polygon)
+                }
+                // 地图自适应
+                map.setFitView()
+            }
+        })
+        district.search('门头沟区', function(status, result) {
+            // 获取朝阳区的边界信息
+            var bounds = result.districtList[0].boundaries
+            var polygons = []
+            if (bounds) {
+                for (var i = 0, l = bounds.length; i < l; i++) {
+                    //生成行政区划polygon
+                    var polygon = new AMap.Polygon({
+                        map: map,
+                        strokeWeight: 1,
+                        path: bounds[i],
+                        fillOpacity: fillOpacity,
+                        fillColor: '#CCF3FF',
+                        strokeColor: '#0000FF'
+                    })
+                    polygons.push(polygon)
+                }
+                // 地图自适应
+                map.setFitView()
+            }
+        })
+        district.search('通州区', function(status, result) {
+            // 获取朝阳区的边界信息
+            var bounds = result.districtList[0].boundaries
+            var polygons = []
+            if (bounds) {
+                for (var i = 0, l = bounds.length; i < l; i++) {
+                    //生成行政区划polygon
+                    var polygon = new AMap.Polygon({
+                        map: map,
+                        strokeWeight: 1,
+                        path: bounds[i],
+                        fillOpacity: fillOpacity,
+                        fillColor: '#CCF3FF',
+                        strokeColor: '#0000FF'
+                    })
+                    polygons.push(polygon)
+                }
+                // 地图自适应
+                map.setFitView()
+            }
+        })
+        district.search('延庆区', function(status, result) {
+            // 获取朝阳区的边界信息
+            var bounds = result.districtList[0].boundaries
+            var polygons = []
+            if (bounds) {
+                for (var i = 0, l = bounds.length; i < l; i++) {
+                    //生成行政区划polygon
+                    var polygon = new AMap.Polygon({
+                        map: map,
+                        strokeWeight: 1,
+                        path: bounds[i],
+                        fillOpacity: fillOpacity,
+                        fillColor: '#CCF3FF',
+                        strokeColor: '#0000FF'
+                    })
+                    polygons.push(polygon)
+                }
+                // 地图自适应
+                map.setFitView()
+            }
+        })
+        district.search('密云区', function(status, result) {
+            // 获取朝阳区的边界信息
+            var bounds = result.districtList[0].boundaries
+            var polygons = []
+            if (bounds) {
+                for (var i = 0, l = bounds.length; i < l; i++) {
+                    //生成行政区划polygon
+                    var polygon = new AMap.Polygon({
+                        map: map,
+                        strokeWeight: 1,
+                        path: bounds[i],
+                        fillOpacity: fillOpacity,
+                        fillColor: '#CCF3FF',
+                        strokeColor: '#0000FF'
+                    })
+                    polygons.push(polygon)
+                }
+                // 地图自适应
+                map.setFitView()
+            }
+        })
+        district.search('昌平区', function(status, result) {
+            // 获取朝阳区的边界信息
+            var bounds = result.districtList[0].boundaries
+            var polygons = []
+            if (bounds) {
+                for (var i = 0, l = bounds.length; i < l; i++) {
+                    //生成行政区划polygon
+                    var polygon = new AMap.Polygon({
+                        map: map,
+                        strokeWeight: 1,
+                        path: bounds[i],
+                        fillOpacity: fillOpacity,
+                        fillColor: '#CCF3FF',
+                        strokeColor: '#0000FF'
+                    })
+                    polygons.push(polygon)
+                }
+                // 地图自适应
+                map.setFitView()
+            }
+        })
+        district.search('怀柔区', function(status, result) {
+            // 获取朝阳区的边界信息
+            var bounds = result.districtList[0].boundaries
+            var polygons = []
+            if (bounds) {
+                for (var i = 0, l = bounds.length; i < l; i++) {
+                    //生成行政区划polygon
+                    var polygon = new AMap.Polygon({
+                        map: map,
+                        strokeWeight: 1,
+                        path: bounds[i],
+                        fillOpacity: fillOpacity,
+                        fillColor: '#CCF3FF',
+                        strokeColor: '#0000FF'
+                    })
+                    polygons.push(polygon)
+                }
+                // 地图自适应
+                map.setFitView()
+            }
+        })
+        district.search('顺义区', function(status, result) {
+            // 获取朝阳区的边界信息
+            var bounds = result.districtList[0].boundaries
+            var polygons = []
+            if (bounds) {
+                for (var i = 0, l = bounds.length; i < l; i++) {
+                    //生成行政区划polygon
+                    var polygon = new AMap.Polygon({
+                        map: map,
+                        strokeWeight: 1,
+                        path: bounds[i],
+                        fillOpacity: fillOpacity,
+                        fillColor: '#CCF3FF',
+                        strokeColor: '#0000FF'
+                    })
+                    polygons.push(polygon)
+                }
+                // 地图自适应
+                map.setFitView()
+            }
+        })
+        district.search('平谷区', function(status, result) {
+            // 获取朝阳区的边界信息
+            var bounds = result.districtList[0].boundaries
+            var polygons = []
+            if (bounds) {
+                for (var i = 0, l = bounds.length; i < l; i++) {
+                    //生成行政区划polygon
+                    var polygon = new AMap.Polygon({
+                        map: map,
+                        strokeWeight: 1,
+                        path: bounds[i],
+                        fillOpacity: fillOpacity,
+                        fillColor: '#CCF3FF',
+                        strokeColor: '#0000FF'
+                    })
+                    polygons.push(polygon)
+                }
+                // 地图自适应
+                map.setFitView()
+            }
+        })
+        district.search('大兴区', function(status, result) {
+            // 获取朝阳区的边界信息
+            var bounds = result.districtList[0].boundaries
+            var polygons = []
+            if (bounds) {
+                for (var i = 0, l = bounds.length; i < l; i++) {
+                    //生成行政区划polygon
+                    var polygon = new AMap.Polygon({
+                        map: map,
+                        strokeWeight: 1,
+                        path: bounds[i],
+                        fillOpacity: fillOpacity,
+                        fillColor: '#CCF3FF',
+                        strokeColor: '#0000FF'
+                    })
+                    polygons.push(polygon)
+                }
+                // 地图自适应
+                map.setFitView()
+            }
+        })
+    })
+}
+
+function getdtree(dtree,index){
+    $.ax("/getDicer",
+        null,
+        null,
+        null,
+        null,
+        function(res){
+            console.log(res.data)
+            var elem = "#toolbarDiv";
+            var type = "区域监测";
+            if(index==1){
+                elem = "#toolbarDiv1";
+                type = "重点监测";
+            }
+            var data = {
+                type:type
+            };
+            if(typeof ($("#date").val())!="undefined"){
+                data.year = $("#date").val();
+            }
+
+
+            getajax(data,index);
+            var DTree = dtree.render({
+                elem: elem,
+                data: res.data,
+                defaultRequest:{
+                    dataCode:'dataCode',
+                    dataIndex:'dataIndex'
+                },
+                record:true,
+                checkbar: true,
+                initLevel: 1,
+                accordion: true,  // 开启手风琴
+                checkbarType: "only", // 默认就是all，其他的值为： no-all  p-casc   self  only
+                checkbarFun: {
+                    chooseDone: function(checkbarNodesParam) { //复选框点击事件完毕后，返回该树关于复选框操作的全部信息。
+                        console.log(checkbarNodesParam[0])
+                        if(index==0||typeof (indexflag)=='undefined'){
+
+                            getajax({name:checkbarNodesParam[0].recordData.dataCode,
+                                index:checkbarNodesParam[0].recordData.dataIndex,
+                                type:'区域监测',year:$("#date").val()},0)
+                            return;
+                        }else{
+                            getajax({name:checkbarNodesParam[0].recordData.dataCode,
+                                index:checkbarNodesParam[0].recordData.dataIndex,
+                                type:'重点监测',year:$("#date").val()},index)
+                            return;
+                        }
+
+                    }
+                }
+            });
+        },
+        function(error){
+            alert("出错了");
+        }
+    );
+}
+
+
+function getajax(data,index){
+    var map;
+    if(index==0){
+        map = new AMap.Map('container', {
+            zoom: 11,
+            center: [116.397428, 39.90923],
+            resizeEnable: true,
+            mapStyle: 'amap://styles/5e5e1d41627490a3db3784528d6e545a'
+        });
+        AMap.plugin(['AMap.ToolBar','AMap.Scale','AMap.OverView'],function(){
+            map.addControl(new AMap.ToolBar());
+            map.addControl(new AMap.Scale());
+        })
+    }else{
+        map = new AMap.Map('container1', {
+            zoom: 11,
+            center: [116.397428, 39.90923],
+            resizeEnable: true,
+            mapStyle: 'amap://styles/5e5e1d41627490a3db3784528d6e545a'
+        });
+        AMap.plugin(['AMap.ToolBar','AMap.Scale'],function(){
+            map.addControl(new AMap.ToolBar());
+            map.addControl(new AMap.Scale());
+        })
+    }
+    var index;
+    $.axget("/getData",data,function(){
+        console.log('123123213');
+        index = layer.msg('请稍后...', {icon: 16,shade: [0.5, '#f5f5f5'],scrollbar: false,offset: 'auto',time:false})
+        },function (res) {
+        console.log(res);
+        var mass;
+        if(typeof (res.data.years)!='undefined'||res.data.years!=''){
+            $("#date").val(res.data.years);
+        }
+
+        getCity(map);
+
+        var style = [{
+            url: '../static/images/icon0.png',
+            anchor: new AMap.Pixel(4, 4),
+            size: new AMap.Size(30, 30),
+        }, {
+            url: '../static/images/icon1.png',
+            anchor: new AMap.Pixel(4, 4),
+            size: new AMap.Size(30, 30)
+        }, {
+            url: '../static/images/icon2.png',
+            anchor: new AMap.Pixel(3, 3),
+            size: new AMap.Size(30, 30)
+        },{
+            url: '../static/images/icon3.png',
+            anchor: new AMap.Pixel(3, 3),
+            size: new AMap.Size(30, 30)
+        }, {
+            url: '../static/images/icon4.png',
+            anchor: new AMap.Pixel(3, 3),
+            size: new AMap.Size(30, 30)
+        }];
+
+        if(index==0){
+            $("#imagerview").empty();
+            var html="";
+            for (var i = 0; i <res.data.listName.length ; i++) {
+                html+= "<div class=\"input-item\">" +
+                    "     <span>"+res.data.listName[i].name+"</span>" +
+                    "      <div>\n" +
+                    "      <img src="+res.data.listName[i].url+">\n" +
+                    "      </div>\n" +
+                    "  </div>";
+            }
+            $("#imagerview").append(html);
+        }else{
+            $("#typeimage").empty();
+            var html="";
+            for (var i = 0; i <res.data.listName.length ; i++) {
+                html+= "<div class=\"input-item\">" +
+                    "     <span>"+res.data.listName[i].name+"</span>" +
+                    "      <div>\n" +
+                    "      <img src="+res.data.listName[i].url+">\n" +
+                    "      </div>\n" +
+                    "  </div>";
+            }
+            $("#typeimage").append(html);
+        }
+        console.log('-----------------------'+map)
+
+        mass = new AMap.MassMarks(res.data.data,{
+            opacity: 1,
+            zIndex: 111,
+            cursor: 'pointer',
+            style: style
+        });
+        mass.setMap(map);
+
+        mass.on('mouseout',function (e) {
+            infoWindow.close();
+        });
+        var infoWindow = new AMap.InfoWindow({
+            offset: new AMap.Pixel(0, 0),
+            isCustom:true,
+            autoMove:false,
+            closeWhenClickMap:false
+
+        });
+        mass.on('mouseover', function (e) {
+            console.log(e)
+            var html = "<div class=\"make\">\n" +
+                "    <label>编号：<span>"+e.data.samplecode+"</span></label>\n" +
+                "    <div style=\"border-top:1px dashed #cccccc;height: 1px;overflow:hidden\"></div>\n" +
+                "    <div style=\" display: inline;\n" +
+                "        flex-direction: row;\">\n" +
+                "        <label>经度：<span>"+e.data.xx+"</span></label>\n" +
+                "        <label>纬度：<span>"+e.data.yy+"</span></label>\n" +
+                "    </div>\n" +
+                "    <div style=\"border-top:1px dashed #cccccc;height: 1px;overflow:hidden\"></div>\n" +
+                "    <div style=\" display: inline;\n" +
+                "        flex-direction: row;\">\n" +
+                "        <label>区：<span>"+e.data.street+"</span></label>\n" +
+                "        <label>乡（镇）：<span>"+e.data.community+"</span></label>\n" +
+                "    </div>\n" +
+                "    <div style=\"border-top:1px dashed #cccccc;height: 1px;overflow:hidden\"></div>\n" +
+                "    <div style=\" display: inline;\n" +
+                "        flex-direction: row;\">\n" +
+                "        <label>土地利用：<span>"+e.data.utilization+"</span></label>\n" +
+                "        <label>土壤质地：<span>"+e.data.solitype+"</span></label>\n" +
+                "    </div>\n" +
+                "    <div style=\"border-top:1px dashed #cccccc;height: 1px;overflow:hidden\"></div>\n" +
+                "    <label>位置：<span>"+e.data.site+"</span></label>\n" +
+                "</div>";
+            infoWindow.setContent(html);
+            infoWindow.open(map, e.data.lnglat);
+        });
+
+
+    },function (error) {
+        alert("出错了");
+    },function () {
+        layer.close(index);
+    })
+}
+
 //重点工区的方法
 function user(){
-    $.axget("/getDicImgType",{pid:'2'},function (res) {
+    $(".spanYear").html($("#date").val());
+    $.axget("/getDicImgType",{pid:'2'},function(){
+
+    },function (res) {
         getImage('46');
         layui.dtree.render({
             elem: "#toolbarDiv3",
@@ -61,13 +827,17 @@ function user(){
         });
     },function (error) {
 
+    },function () {
+        
     })
 
 
 }
 
 function getImage(pid) {
-    $.axget("/getImageFile",{'pid':pid,'type':'1',year:$("#date").val()},function (res) {
+    $.axget("/getImageFile",{'pid':pid,'type':'1',year:$("#date").val()},function(){
+
+    },function (res) {
         console.log(res);
         var list = res.data;
 
@@ -105,6 +875,8 @@ function getImage(pid) {
         }
     },function (error) {
 
+    },function () {
+        
     })
 
 }
@@ -112,7 +884,9 @@ function getImage(pid) {
 
 
 function manage(){
-    $.axget("/getDicForPid",{pid:'2'},function (res) {
+    $.axget("/getDicForPid",{pid:'2'},function(){
+
+    },function (res) {
         console.log(res);
         $('#quiz1').empty();
         $.each(res.data, function (index, item) {
@@ -121,7 +895,9 @@ function manage(){
             $('#quiz1').append(new Option(item.dataCode, item.id));// 下拉菜单里添加元素
         });
         layui.form.render("select");//重新渲染 固定写法
-        $.axget("/getDicForPid",{pid:'42'},function (res) {
+        $.axget("/getDicForPid",{pid:'42'},function(){
+
+        },function (res) {
             $.each(res.data, function (index, item) {
                 $('#quiz2').append(new Option(item.title, item.id));// 下拉菜单里添加元素
             });
@@ -129,15 +905,21 @@ function manage(){
             city('42');
         },function (error) {
 
+        },function () {
+            
         })
 
 
 
     },function (error) {
 
+    },function () {
+        
     })
 
-    $.axget("/getDicForPid",{pid:"3"},function (res) {
+    $.axget("/getDicForPid",{pid:"3"},function(){
+
+    },function (res) {
         console.log(res);
         $('#imgtype').empty();
         $.each(res.data, function (index, item) {
@@ -147,6 +929,8 @@ function manage(){
         });
     },function (error) {
 
+    },function () {
+        
     })
 
 
@@ -171,7 +955,9 @@ function AnQuan() {
     })
 
 
-    $.axget("/getDataForByType",{type:'区域监测',year:$("#date").val()},function (res) {
+    $.axget("/getDataForByType",{type:'区域监测',year:$("#date").val()},function(){
+
+    },function (res) {
         console.log(res);
         var data = res.data;
         var charts = Highcharts.chart('administrativeContainer', {
@@ -216,9 +1002,13 @@ function AnQuan() {
         });
     },function (error) {
 
+    },function () {
+        
     });
 
-    $.axget("/getDataForByTypeNutrient",{type:'区域监测',year:$("#date").val()},function (res) {
+    $.axget("/getDataForByTypeNutrient",{type:'区域监测',year:$("#date").val()},function(){
+
+    },function (res) {
         var data = res.data;
         var chart = Highcharts.chart('nutrientContainer', {
             title: {
@@ -260,9 +1050,13 @@ function AnQuan() {
         });
     },function (error) {
 
+    },function () {
+        
     })
 
-    $.axget("/getDataForByEnvironmentContainer",{type:'区域监测',year:$("#date").val()},function (res) {
+    $.axget("/getDataForByEnvironmentContainer",{type:'区域监测',year:$("#date").val()},function(){
+
+    },function (res) {
         var data = res.data;
         var chart = Highcharts.chart('environmentContainer', {
             title: {
@@ -276,8 +1070,6 @@ function AnQuan() {
                 pointFormat: '{point.name}: <b>{point.percentage:.1f}%</b>'
             },
             plotOptions: {
-
-
                 pie: {
                     allowPointSelect: true,
                     showInLegend: false,
@@ -287,24 +1079,13 @@ function AnQuan() {
                         showInLegend: true,
                         enabled: true,
                         style: {
-                             fontWeight: 'bold',
+                            fontWeight: 'bold',
                             // color: 'white',
                             textShadow: '0px 1px 1px black'
                         }
                     },
                     startAngle: -180, // 圆环的开始角度
                     endAngle: 180,    // 圆环的结束角度
-                   /* allowPointSelect: false,
-                    showInLegend: true,
-                    cursor: 'pointer',
-                    dataLabels: {
-                        enabled: true,
-                        format: '<b>{point.name}</b>: {point.percentage:.1f} %',
-                        style: {
-                            color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
-                        }
-                    }*/
-                    // center: ['50%', '75%']
                 }
             },
             series: [{
@@ -316,8 +1097,108 @@ function AnQuan() {
         });
     },function (error) {
 
+    },function () {
+        
     })
-    $.axget("/getLandTypeContainer",{type:'区域监测',year:$("#date").val()},function (res) {
+
+  /*  $.axget("/getHealthElements",{type:'区域监测',year:$("#date").val(),pid:'28'},function(){
+
+    },function (res) {
+        var data = res.data;
+        var chart = Highcharts.chart('healthElements', {
+            title: {
+                text: null
+            },
+            credits: {
+                enabled: false
+            },
+            tooltip: {
+                headerFormat: '{series.name}<br>',
+                pointFormat: '{point.name}: <b>{point.percentage:.1f}%</b>'
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    showInLegend: false,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                        showInLegend: true,
+                        enabled: true,
+                        style: {
+                            fontWeight: 'bold',
+                            // color: 'white',
+                            textShadow: '0px 1px 1px black'
+                        }
+                    },
+                    startAngle: -180, // 圆环的开始角度
+                    endAngle: 180,    // 圆环的结束角度
+                }
+            },
+            series: [{
+                type: 'pie',
+                name: '环境综合占比',
+                innerSize: '50%',
+                data: data
+            }]
+        });
+    },function (error) {
+
+    },function () {
+        
+    })*/
+
+    $.axget("/getComprehensive",{type:'区域监测',year:$("#date").val()},function(){
+
+    },function (res) {
+        var data = res.data;
+        var chart = Highcharts.chart('comprehensive', {
+            title: {
+                text: null
+            },
+            credits: {
+                enabled: false
+            },
+            tooltip: {
+                headerFormat: '{series.name}<br>',
+                pointFormat: '{point.name}: <b>{point.percentage:.1f}%</b>'
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    showInLegend: false,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                        showInLegend: true,
+                        enabled: true,
+                        style: {
+                            fontWeight: 'bold',
+                            // color: 'white',
+                            textShadow: '0px 1px 1px black'
+                        }
+                    },
+                    startAngle: -180, // 圆环的开始角度
+                    endAngle: 180,    // 圆环的结束角度
+                }
+            },
+            series: [{
+                type: 'pie',
+                name: '环境综合占比',
+                innerSize: '50%',
+                data: data
+            }]
+        });
+    },function (error) {
+
+    },function () {
+        
+    })
+
+
+    $.axget("/getLandTypeContainer",{type:'区域监测',year:$("#date").val()},function(){
+
+    },function (res) {
         console.log(res);
         var data = res.data;
         var charts = Highcharts.chart('landTypeContainer', {
@@ -365,10 +1246,14 @@ function AnQuan() {
 
     },function (error) {
 
+    },function () {
+        
     });
 
 
-    $.axget("/getNameCount",{type:'区域监测',year:$("#date").val(),pid:'26'},function (res) {
+    $.axget("/getNameCount",{type:'区域监测',year:$("#date").val(),pid:'26',index:'1'},function(){
+
+    },function (res) {
         console.log(res);
         var data = res.data;
         Highcharts.chart('environmentalHealthContainer', {
@@ -406,9 +1291,13 @@ function AnQuan() {
 
     },function (error) {
 
+    },function () {
+        
     })
 
-    $.axget("/getNameCount",{type:'区域监测',year:$("#date").val(),pid:'27'},function (res) {
+    $.axget("/getNameCount",{type:'区域监测',year:$("#date").val(),pid:'27'},function(){
+
+    },function (res) {
         var data = res.data;
         var chart = Highcharts.chart('nutrientIndicatorsContainer', {
             chart: {
@@ -444,10 +1333,14 @@ function AnQuan() {
         });
     },function (error) {
 
+    },function () {
+        
     })
 
 
-    $.axget("/getNameCount",{type:'区域监测',year:$("#date").val(),pid:'28'},function (res) {
+    $.axget("/getNameCount",{type:'区域监测',year:$("#date").val(),pid:'28'},function(){
+
+    },function (res) {
         var data = res.data;
         var chart = Highcharts.chart('soundDevelopmentContainer', {
             chart: {
@@ -484,6 +1377,8 @@ function AnQuan() {
 
     },function (error) {
 
+    },function () {
+        
     })
 
 
@@ -492,7 +1387,9 @@ function AnQuan() {
 
 function getregionalism(data) {
     console.log(data);
-    $.axget("/getNutrientForCity",{type:'区域监测',year:$("#date").val(),city:data.recordData.dataCode},function (res) {
+    $.axget("/getNutrientForCity",{type:'区域监测',year:$("#date").val(),city:data.recordData.dataCode},function(){
+
+    },function (res) {
         var list = res.data;
         //citynutrientContainer
         console.log(list)
@@ -539,8 +1436,12 @@ function getregionalism(data) {
 
     },function (error) {
         console.log(error)
+    },function () {
+        
     })
-    $.axget("/getEnvironmentForCity",{type:'区域监测',year:$("#date").val(),city:data.recordData.dataCode},function (res) {
+    $.axget("/getEnvironmentForCity",{type:'区域监测',year:$("#date").val(),city:data.recordData.dataCode},function(){
+
+    },function (res) {
         var list = res.data;
         //citynutrientContainer
         console.log(list)
@@ -586,9 +1487,13 @@ function getregionalism(data) {
 
     },function (error) {
         console.log(error)
+    },function () {
+        
     })
 
-    $.axget("/getLandTypeForCity",{type:'区域监测',year:$("#date").val(),city:data.recordData.dataCode},function (res) {
+    $.axget("/getLandTypeForCity",{type:'区域监测',year:$("#date").val(),city:data.recordData.dataCode},function(){
+
+    },function (res) {
         console.log(res);
         var data = res.data;
         var charts = Highcharts.chart('landTypeContainerContainer', {
@@ -623,7 +1528,7 @@ function getregionalism(data) {
             },
             tooltip: {
                 headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-                pointFormat: '<span style="color:{point.color}">{point.name}</span>: 占比例为<b>{point.number}</b> <br/>'
+               /* pointFormat: '<span style="color:{point.color}">{point.name}</span>: 占比例为<b>{point.number}</b> <br/>'*/
             },
             series: [{
                 name: '行政区域',
@@ -636,6 +1541,8 @@ function getregionalism(data) {
 
     },function (error) {
 
+    },function () {
+        
     });
 
 }
@@ -651,7 +1558,9 @@ function shouRu(){
 
 function city(pid) {
     $('#quiz2').empty();
-    $.axget("/getDicForPid",{pid:pid},function (res) {
+    $.axget("/getDicForPid",{pid:pid},function(){
+
+    },function (res) {
         var pid = $("select[name='quiz2']").val();
         $.each(res.data, function (index, item) {
             $('#quiz2').append(new Option(item.title, item.id));// 下拉菜单里添加元素
@@ -765,5 +1674,7 @@ function city(pid) {
         });
     },function (error) {
 
+    },function () {
+        
     })
 }

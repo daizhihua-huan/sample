@@ -16,13 +16,12 @@ logging:
   level:
     com.daizhihua.sample.dao : debug
 spring:
-
-  boot:
-    admin:
-      client:
-        url: http://localhost:8000
-        instance:
-          name: ReactiveCrud
+#  boot:
+#    admin:
+#      client:
+#        url: http://localhost:8000
+#        instance:
+#          name: ReactiveCrud
   datasource:
     url: jdbc:mysql://39.104.177.194:3306/daizhihua?serverTimezone=UTC&characterEncoding=utf8&useUnicode=true&useSSL=false
     username: root
@@ -82,3 +81,6 @@ spring:
 
   thymeleaf:
     prefix:  classpath:/templates/
+  servlet:
+    multipart:
+      max-file-size: 100MB

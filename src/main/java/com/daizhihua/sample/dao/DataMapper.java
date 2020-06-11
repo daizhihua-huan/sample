@@ -41,6 +41,9 @@ public interface DataMapper  extends BaseMapper<DataEntity> {
     @Select("select environmental as name,count(id) as y from dataentity where type='${type}' and years='${year}' group by environmental ")
     List<Map<String,Object>>getEnvironmentContainer(@Param("type")String type,@Param("year")String year);
 
+    @Select("select comprehensive as name,count(id) as y from dataentity where type='${type}' and years='${year}' group by comprehensive")
+    List<Map<String,Object>>getcomprehensive(@Param("type")String type,@Param("year")String year);
+
 
     @Select("select environmental as name,count(id) as y from dataentity where type='${type}' and years='${year}' and district='${district}' group by environmental ")
     List<Map<String,Object>>getEnvironmentContainerCity(@Param("type")String type,@Param("year")String year,@Param("district")String district);
@@ -54,7 +57,7 @@ public interface DataMapper  extends BaseMapper<DataEntity> {
     @Select("select utilization as name,count(id) as y from dataentity where type='${type}' and years='${year}' and district='${district}' group by utilization")
     List<Map<String,Object>>getLandTypeContainerCity(@Param("type")String type,@Param("year")String year,@Param("district")String district);
 
-    @Select("select ${name} as name,count(id) as data from dataentity where type='${type}' and years='${year}' group by ${name}")
+    @Select("select ${name} as name,count(id) as data from dataentity where type='${type}' and years='${year}' group by ${name} order by name desc")
     List<Map<String,Object>>getNameCount(@Param("name")String name,@Param("type")String type,@Param("year")String year);
 
     @Select("select count(id) as total,years from dataentity where type = '${type}' group by years order by total desc")

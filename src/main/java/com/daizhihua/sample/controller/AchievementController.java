@@ -58,7 +58,6 @@ public class AchievementController {
         }
         return Resut.ok(list);
     }
-
     /**
      *
      * @param type
@@ -72,9 +71,7 @@ public class AchievementController {
 
         return Resut.ok(list);
     }
-
     /**
-     *
      * @param type
      * @param year
      * @return
@@ -94,10 +91,17 @@ public class AchievementController {
     @RequestMapping(value = "/getLandTypeContainer")
     public Resut getLandTypeContainer(String type,String year){
         List<Map<String, Object>> list = dataMapper.getLandTypeContainer(type, year);
+        float typeCount = dataMapper.getTypeCount(type,year);
+        DecimalFormat df = new DecimalFormat();
+        df.setMaximumFractionDigits(2);
+        df.setMinimumFractionDigits(2);
+        log.info(typeCount);
+        for (Map<String, Object> map : list) {
+            float y = Integer.parseInt(map.get("y").toString());
+            map.put("number",  df.format( (y/typeCount)* 100.00) + "%");
+        }
         return Resut.ok(list);
     }
-
-
     /**
      * 获取各元素的占比图
      * @param type
@@ -117,6 +121,10 @@ public class AchievementController {
         List<String> listName = new ArrayList<>();
         int i=0;
         for (Dict dict : dicts) {
+            //statu为1说明不需要统计getNameCount
+            if(dict.getStatus().equals("1")){
+                continue;
+            }
             listName.add(dict.getTitle());
             List<Map<String, Object>> nameCount = dataMapper.getNameCount(dict.getDataCode(), type, year);
             for (Map<String, Object> stringObjectMap : nameCount) {
@@ -140,7 +148,6 @@ public class AchievementController {
                     list.add(Integer.valueOf(stringObjectMap.get("data").toString()));
                     resultMap.put(stringObjectMap.get("name").toString(),list);
                 }
-
             }
             i++;
         }
@@ -156,10 +163,17 @@ public class AchievementController {
             @Override
             public int compare(Map<String, Object> o1, Map<String, Object> o2) {
 
+
+
                 String name1 = o1.get("name").toString().substring(0,1);
 //                log.info("name1是：{}",name1);
                 int number1 = 0;
                 int number2 = 0;
+
+                if(NumberUtil.toStringNumber(o1.get("name").toString())!=0){
+                    number1 = NumberUtil.toStringNumber(o1.get("name").toString());
+                }
+
                 if(!StringUtils.isEmpty(NumberUtil.toNumber(name1))){
                     number1 = Integer.parseInt(NumberUtil.toNumber(name1));
                 }
@@ -169,6 +183,10 @@ public class AchievementController {
                 if(!StringUtils.isEmpty(NumberUtil.toNumber(name2))){
                     number2 = Integer.parseInt(NumberUtil.toNumber(name2));
                 }
+                if(NumberUtil.toStringNumber(o2.get("name").toString())!=0){
+                    number2 = NumberUtil.toStringNumber(o2.get("name").toString());
+                }
+
                 return  number1-number2;
 
             }
@@ -205,6 +223,8 @@ public class AchievementController {
     @RequestMapping(value = "/getLandTypeForCity")
     public Resut getLandTypeForCity(String type,String year,String city){
         List<Map<String, Object>> landTypeContainerCity = dataMapper.getLandTypeContainerCity(type, year, city);
+
+
         return Resut.ok(landTypeContainerCity);
     }
 
@@ -218,6 +238,30 @@ public class AchievementController {
         List<ImgTypeEntity> imgTypeEntities = imgTypeMapper.selectByMap(map);
         return Resut.ok(imgTypeEntities);
     }
+
+    @RequestMapping(value = "/getHealthElements")
+    public Resut getHealthElements(String type,String year,String pid){
+        List<Dict> dicts  = dicMapper.selectList(new QueryWrapper<Dict>()
+                .eq("pid", pid)
+                .orderBy(true,true,"sort_no"));
+
+        for (Dict dict : dicts) {
+            List<Map<String, Object>> nameCount = dataMapper.getNameCount(dict.getDataCode(), type, year);
+            log.info(nameCount);
+        }
+        return Resut.ok();
+
+    }
+
+    /**
+     * 综合分级
+     * @return
+     */
+    @RequestMapping(value = "/getComprehensive")
+    public Resut comprehensive(String type,String year){
+        return Resut.ok(dataMapper.getcomprehensive(type,year));
+    }
+
 
 
 }

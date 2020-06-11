@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.api.R;
 import com.daizhihua.sample.core.Resut;
 import com.daizhihua.sample.dao.*;
 import com.daizhihua.sample.entity.*;
+import com.daizhihua.sample.util.DataUtil;
 import com.daizhihua.sample.util.DateUtil;
 import com.daizhihua.sample.util.ExcelUtils;
 import com.daizhihua.sample.util.NumberUtil;
@@ -243,7 +244,16 @@ public class FileController {
         List<GradeCode> listName = new ArrayList<>();
         if(StringUtils.isEmpty(year)){
             return Resut.ok(getDataForTotal(type));
-        }else{
+        }else if(StringUtils.isEmpty(name)&&StringUtils.isEmpty(index)){
+            Map<String,Object> map = new HashMap<>();
+            map.put("type",type);
+            map.put("years",year);
+            List<DataEntity> all = dataMapper.selectByMap(map);
+            mapAll.put("data",DataUtil.getDataList(all));
+            mapAll.put("listName",listName);
+            mapAll.put("years",year);
+            return Resut.ok(mapAll);
+        }else {
             Map<String,Object> map = new HashMap<>();
             map.put("type",type);
             map.put("years",year);
@@ -301,7 +311,7 @@ public class FileController {
     }
 
 
-    public Map<String,Object> getDataForTotal(String type){
+    private Map<String,Object> getDataForTotal(String type){
         Map<String,Object> mapAll = new HashMap<>();
         List<Map<String, Object>> totalTypeForYears = dataMapper.getTotalTypeForYears(type);
         String year;
@@ -313,17 +323,7 @@ public class FileController {
                     .eq("type", type)
                     .eq("years", map.get("years"))
             );
-
-            for (DataEntity dataEntity : dataEntities) {
-                String longitude = dataEntity.getXx();
-                String latitude = dataEntity.getYy();
-                List<String> list = new ArrayList<>();
-                list.add(longitude);
-                list.add(latitude);
-                dataEntity.setLnglat(list);
-//                dataEntity.setStyle(0);
-            }
-            mapAll.put("data",dataEntities);
+            mapAll.put("data", DataUtil.getDataList(dataEntities));
             mapAll.put("listName",new ArrayList<>());
             mapAll.put("years",year);
         }

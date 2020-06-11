@@ -85,18 +85,24 @@ $(function(){
      * successfn 成功回调函数
      * errorfn 失败回调函数
      */
-    jQuery.axget=function(url, data, successfn, errorfn) {
+    jQuery.axget=function(url, data,before, successfn, errorfn,complete) {
         data = (data==null || data=="" || typeof(data)=="undefined")? {"date": new Date().getTime()} : data;
         $.ajax({
             type: "get",
             data: data,
             url: url,
             dataType: "json",
+            beforeSend: function(){
+              before()
+            },
             success: function(d){
                 successfn(d);
             },
             error: function(e){
                 errorfn(e);
+            },
+            complete:function () {
+                complete()
             }
         });
     };

@@ -103,9 +103,9 @@ public class DataEntity  {
     //34
     private String f;
 
-    //养分综合
+    //养分综合 35
     private String nutrient;
-    //综合分级
+    //综合分级 36
     private String comprehensive;
 
 

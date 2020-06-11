@@ -64,6 +64,8 @@ public class MySecurity extends WebSecurityConfigurerAdapter {
         //.passwordEncoder(new MyPasswordEncoder())。
         //这样，页面提交时候，密码以明文的方式进行匹配。
         auth.inMemoryAuthentication().passwordEncoder(new MyPasswordEncoder()).withUser("user").password("user").roles("USER");
+
+
     }
 
 

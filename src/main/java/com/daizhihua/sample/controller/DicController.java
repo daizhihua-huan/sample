@@ -83,4 +83,9 @@ public class DicController {
         return Resut.ok(dicMapper.selectByMap(map));
     }
 
+    @RequestMapping(value = "/drope")
+    public Resut dropDataBase(){
+        return Resut.ok(dicMapper.delete(null));
+    }
+
 }

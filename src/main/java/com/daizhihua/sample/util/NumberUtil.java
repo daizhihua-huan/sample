@@ -11,8 +11,24 @@ public class NumberUtil {
                 return s2[i];
             }
         }
-
-
         return result;
     }
+
+    public static int toStringNumber (String data){
+        switch (data){
+            case "剩":
+                return 1;
+            case "高":
+                return 2;
+            case "适量":
+                return 3;
+            case "边缘":
+                return 4;
+            case "缺乏":
+                return 5;
+            default:
+                return 0;
+        }
+    }
+
 }
